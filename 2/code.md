@@ -1,4 +1,4 @@
-'''
+```
 
 ┌──(utyfull㉿kali)-[~]
 └─$ ssh m_pinchuk@185.5.249.140
@@ -340,4 +340,4 @@ m_pinchuk@vds2476450:~/2$ rm my_archive.tar
 m_pinchuk@vds2476450:~/2$ ls
 code.md
 
-'''
+```
