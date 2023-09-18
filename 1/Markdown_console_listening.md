@@ -1,5 +1,4 @@
-﻿<a name="br1"></a> 
-
+'''
 ─(utyfull㉿kali)-[~]
 
 └─$ cd Desktop
@@ -91,11 +90,6 @@ README.md
 ┌──(utyfull㉿kali)-[~/Desktop/git/Labs\_inf/labs\_inf]
 
 └─$ git status
-
-
-
-<a name="br2"></a> 
-
 On branch main
 
 Your branch is up to date with 'origin/main'.
@@ -193,10 +187,6 @@ fa01324..5436aa4 main -> main
 └─$ git status
 
 On branch main
-
-
-
-<a name="br3"></a> 
 
 Your branch is up to date with 'origin/main'.
 
@@ -297,10 +287,6 @@ create mode 100644 .placeholder
 Enumerating objects: 4, done.
 
 Counting objects: 100% (4/4), done.
-
-
-
-<a name="br4"></a> 
 
 Delta compression using up to 4 threads
 
@@ -408,10 +394,6 @@ Markdown\_console\_listening.md
 
 1 file changed, 0 insertions(+), 0 deletions(-)
 
-
-
-<a name="br5"></a> 
-
 create mode 100644 1/Markdown\_console\_listening.md
 
 ┌──(utyfull㉿kali)-[~/…/git/Labs\_inf/labs\_inf/1]
@@ -516,10 +498,6 @@ modified:
 
 Markdown\_console\_listening.md
 
-
-
-<a name="br6"></a> 
-
 no changes added to commit (use "git add" and/or "git commit -a")
 
 ┌──(utyfull㉿kali)-[~/…/git/Labs\_inf/labs\_inf/1]
@@ -591,5 +569,5 @@ On branch main
 Your branch is up to date with 'origin/main'.
 
 nothing to commit, working tree clean
-
+'''
 
