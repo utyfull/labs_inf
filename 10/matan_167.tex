@@ -1,0 +1,54 @@
+\documentclass{article}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={110mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+\usepackage{amsmath}
+\usepackage[T2A]{fontenc}
+\usepackage[skip=10pt plus1pt, indent=20pt]{parskip}
+\usepackage[english, russian]{babel}
+\DeclareMathSizes{10}{10}{10}{6}
+
+\begin{document}
+
+\noindent$\lim_{n \to \infty} f(x_{n}) = 0$ и $\lim_{n \to \infty} f(x^{'}) = 1$, а это означает, что предела
+функции(5.8) при $x \to 0$ не существует.\par
+\quad\textbf{3.} Пусть
+\[f(x)=\frac{x^2 + x + 1}{x^2 - 2}\]
+Найдем предел этой функции при $x \to \infty$. Её областью определения является множество $X = \textbf{R}\backslash\{\sqrt{2}, - \sqrt{2}\}$. Взяв какую-либо последовательность \(x_{n} \in X, n=1, 2, ... , \quad\lim_{n \to \infty} f(x_{n}) = 0\),\par
+\noindentбудем иметь\par
+\begin{center}
+    $lim_{n \to \infty} f(x_{n}) = \frac{x_{n}^2 + x_{n} + 1}{x_{n}^2 - 2} = lim_{n \to \infty} \frac{1 + \frac{1}{x_{n}} + \frac{1}{x_{n}^2}
+    }{1 - \frac{2}{x_{n}^2}}=\frac{1 + lim_{n \to \infty} \frac{1}{x_{n}} + lim_{n \to \infty} \frac{1}{x_{n}^2}{1 - 2}}{lim_{n \to \infty} \frac{1}{x_{n}^2}}=1$.\par
+\end{center}
+Отсюда следует, что $\lim_{n \to \infty}{\frac{x^2 + x + 1}{x^2 - 2}}=1.$\par
+\begin{large}
+    \noindent\textit{Упражнение 5.}
+\end{large}
+\begin{small}
+    Доказать, что предел $\lim_{n \to \infty}{\frac{x}{\sqrt{x^2 + 1}}}$ не существует, а
+    пределы $\lim_{n \to +\infty}{\frac{x}{\sqrt{x^2 + 1}}}$ и $\lim_{n \to -\infty}{\frac{x}{\sqrt{x^2 + 1}}}$ существуют, и найти их.\par
+\end{small}
+При рассмотрении пределов функции часто приходится иметь дело спределами сужений функций на том или ином множестве,
+т. е. с пределами функций: получающихся из данных функций, рассмотрением их не на всем множестве, на котором они заданы,
+а на каком-то, содержащемся в нем.\\
+\textbf{Определение 3.}
+\textit{Пусть $f:X \to \textbf{R}$. Предел в точке $x_0$ сужения $f_E:E \to \textbf{R}, E \subset X$ функции f на множество E называется
+пределом функции f по множеству E в этой точке и обозначается через}\par
+\begin{center}
+    $\lim_{x \to x_0 \atop x \in E} f(x)$.
+\end{center}
+Таким образом,
+\begin{flushright}
+    $\lim_{x \to x_0 \atop x \in E} f(x)\overset{def}{=}\lim_{x \to x_0} f_E(x),$ \phantom{\hspace{55pt}}(5.9)\par
+\end{flushright}
+\begin{center}
+    \rule{50pt}{0.1pt}\par
+    \textit{167}
+\end{center}
+\end{document}
+
+        
