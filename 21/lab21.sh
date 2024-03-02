@@ -5,13 +5,23 @@ if [[ "$1" == "?" ]]; then
 fi;
 suffix="${1:-.txt}"
 long="${2:-100}"
+fname="${3:-ext$suffix}"
 mapfile -t files < <(ls | grep -E "\\$suffix")
-$(fallocate -l 1 ext$suffix)
+if [[ $fname == ext$suffix ]]; then
+	$(fallocate -l 1 ext$suffix)
+fi;
 for file in "${files[@]}"; do
-	dif=$(($long-$(stat --printf="%s" $file)))
-	for (( i = 1; i <= $dif; i++ ))
-	do
-	$(cat ext$suffix >> $file)
-	done
+	dif=$(((((($long-$(stat --printf="%s" $file))/$(stat --printf="%s" $fname))) | bc)+1))
+	if [[ "$3" != "$file" ]]; then
+		for (( i = 1; i <= $dif; i++ ))
+		do
+		$(cat $fname >> $file)
+		done
+		$(truncate -s $long $file) 
+	fi;
 done
-$(rm ext$suffix)
+if [[ $fname == ext$suffix ]]; then
+        $(rm ext$suffix)
+fi;
+
+
