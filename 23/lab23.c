@@ -23,36 +23,21 @@ struct node* create(double value) {
 }
 
 
-// Insert on the left of the node
-struct node* insertLeft(struct node* root, double value) {
-  while (root->left != NULL && root->right != NULL)  {
-    root = root->left;
-  }
-  if (root->left != NULL) {
-    root->right = create(value);
-    return root->right;
-  } else {
-    root->left = create(value);
-    return root->left;
-  }
-  
+// Insert value
+struct node *insertValue(struct node* root, double value) {
+    if (root == NULL) {
+        return create(value);
+    }
+
+    if (value < root->item) {
+        root->left = insertValue(root->left, value);
+    } else if (value > root->item) {
+        root->right = insertValue(root->right, value);
+    }
+
+    return root;
 }
 
-
-// Insert on the right of the node
-struct node* insertRight(struct node* root, double value) {
-  while (root->left != NULL && root->right != NULL)  {
-    root = root->right;
-  }
-  if (root->right != NULL) {
-    root->left = create(value);
-    return root->left;
-  } else {
-    root->right = create(value);
-    return root->right;
-  }
-  
-}
 
 // Delete node function
 struct node* deleteNode(struct node* root, double value) 
@@ -170,9 +155,9 @@ int check(struct node* root)
    return checkUtil(root, level, &leafLevel);
 }
 
-void freeTree (struct node* root) {
+struct node* freeTree (struct node* root) {
     if (root == NULL) {
-      return;
+      return root;
     }
 
     freeTree(root->left);
@@ -186,40 +171,41 @@ void freeTree (struct node* root) {
 int main() {
     double number;
     char command[100];
-    struct node* root = create(0.0);
+    struct node* root = NULL;
 
   while(1) {
     scanf("%s", command);
     if (strcmp(command, "createTree") == 0) {
       scanf("%lf", &number);
-      free(root);
-      struct node* root = create(number);
+      root = freeTree(root);
+      root = create(number);
+      continue;
     }
-    if (strcmp(command, "putLeft") == 0) {
+    if (strcmp(command, "insertValue") == 0) {
       scanf("%lf", &number);
-      insertLeft(root, number);
-    } 
-    if (strcmp(command, "putRight") == 0) {
-      scanf("%lf", &number);
-      insertRight(root, number);
+      insertValue(root, number);
+      continue;
     } 
     if (strcmp(command, "deleteNode") == 0) {
       scanf("%lf", &number);
-      deleteNode(root, number);
+      root = deleteNode(root, number);
+      continue;
     }
     if (strcmp(command, "printTree") == 0) {
       printTree(root, 5);
+      continue;
     }
     if (strcmp(command, "checkLL") == 0) {
       printf("Leaves in one level: %d\n", check(root));
+      continue;
     }
     if (strcmp(command, "exit") == 0) {
-      freeTree(root);
+      root = freeTree(root);
       return 0;
     }
     if (strcmp(command, "freeTree") == 0) {
-      freeTree(root);
-      struct node* root = create(0.0);
+      root = freeTree(root);
+      continue;
     }
   }
 }
