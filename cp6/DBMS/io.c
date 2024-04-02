@@ -1,5 +1,7 @@
 
+
 #include "tableStruct.h"
+
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,108 +9,48 @@
 
 
 int main() {
-    int value;
-    char charValue[100];
-    char tableName[100];
-    char columnName[100];
-    char columnNameList[100][10];
+    char value[50];
+    char tableName[50];
+    char columnName[50];
     char command[100];
-    int columnNameInd = 0;
 
     table *Table = NULL;
-    Table = malloc(sizeof(table));
 
     while(1) {
         scanf("%s", command);
         if (strcmp(command, "createTable") == 0) {
             scanf("%s", tableName);
-            *Table = createTable(tableName);
+            Table = createTable(tableName, 0);
             continue;
         }
-        if (strcmp(command, "createColumn") == 0) {
+        else if (strcmp(command, "createColumn") == 0) {
             scanf("%s", columnName);
-            strcpy(columnNameList[columnNameInd], columnName);
-            insertColumn(Table, columnNameList[columnNameInd]);
-            columnNameInd++;
-            for (int i = 0; i < 3; i++) {
-            //printf("%s - column name, %d - id\n", Table->columns[i].columnName, Table->columns[i].id);
-            }
-            continue;
-        } 
-        if (strcmp(command, "insertCharValue") == 0) {
-            scanf("%s", columnName);
-            scanf("%s", charValue);
-            for (int i = 0; i < Table->size; i++) {
-                if (strcmp(&Table->columns[i].columnName, columnName) == 0) {
-                    insertCharValue(charValue, &Table->columns[i], Table);
-                }
-            }
-            printf("%s - value\n", Table->columns[0].data[Table->columns->size - 1].Citem);
-            printf("%d - size\n", Table->columns[0].size);
+            insertColumn(columnName, &Table);;
             continue;
         }
-        if (strcmp(command, "insertIntValue") == 0) {
-            scanf("%s", columnName);
-            scanf("%d", &value);
-            for (int i = 0; i < Table->size; i++) {
-                if (strcmp(&Table->columns[i].columnName, columnName) == 0) {
-                    insertIntValue(value, &Table->columns[i], Table);
-                }
-            }
-            //printf("%d - value\n", Table->columns[0].data[0].Iitem);
+        else if (strcmp(command, "printTable") == 0) {
+            printTable(Table);
             continue;
         }
-        if (strcmp(command, "printCharColumn") == 0) {
+        else if (strcmp(command, "insertValue") == 0) {
             scanf("%s", columnName);
+            scanf("%s", value);
             for (int i = 0; i < Table->size; i++) {
-                if (strcmp(&Table->columns[i].columnName, columnName) == 0) {
-                    printCharColumn(&Table->columns[i]);
+                if (strcmp(Table->columns[i]->columnName, columnName) == 0){
+                    insertValue(Table, i, value);
                 }
             }
             continue;
         }
-        if (strcmp(command, "printIntColumn") == 0) {
-            scanf("%s", columnName);
-            for (int i = 0; i < Table->size; i++) {
-                if (strcmp(&Table->columns[i].columnName, columnName) == 0) {
-                    printIntColumn(&Table->columns[i]);
-                }
-            }
-            continue;
-        }
-        if (strcmp(command, "deleteCharValue") == 0) {
-            scanf("%s", columnName);
-            scanf("%s", charValue);
-            for (int i = 0; i < Table->size; i++) {
-                if (strcmp(&Table->columns[i].columnName, columnName) == 0) {
-                    deleteCharValue(charValue, &Table->columns[i], Table);
-                }
-            }
-            continue;
-        }
-
-        if (strcmp(command, "deleteIntValue") == 0) {
-            scanf("%s", columnName);
-            scanf("%d", &value);
-            for (int i = 0; i < Table->size; i++) {
-                if (strcmp(&Table->columns[i].columnName, columnName) == 0) {
-                    deleteIntValue(value, &Table->columns[i], Table);
-                }
-            }
-            continue;
-        }
-
-        if (strcmp(command, "deleteTable") == 0) {
-            Table = freeTable(Table);
-            continue;
-        }
-        if (strcmp(command, "exit") == 0) {
+        else if (strcmp(command, "exit") == 0) {
+            if (Table != NULL) {
             freeTable(Table);
+            free(Table);
+            }
             break;
-        }
-        if (strcmp(command, EOF) == 0) {
-            freeTable(Table);
-            break;
+        } else {
+            printf("Invalid input\n");
+            memset(command, 0 , 100);
         }
     }
 }

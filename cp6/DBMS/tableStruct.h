@@ -6,28 +6,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 typedef struct {
-    char tableName;
-    column *columns;
+    char tableName[50];
+    column **columns;
     int size;
+    int id;
 } table;
 
-table createTable(char *name);
-
-void insertColumn(table *Table, char *name);
-void insertIntValue(int value, column *Column, table *Table);
-void insertCharValue(char *value, column *Column, table *Table);
-
-column freeColumn(column *Column);
-table* freeTable(table *Table);
-
-void deleteIntValue(int value, column *Column, table *Table);
-void deleteCharValue(char *value, column *Column, table *Table);
-void deleteIndex(int index, table *Table);
-
-void printIntColumn(column *Column);
-void printCharColumn(column *Column);
-
-void makeMemory(table *Table, size_t size);
+table* createTable(char* tableName, int id);
+void insertColumn(char* columnName, table** Table);
+void freeTable(table *Table);
+void deleteColumn(table *Table, int ind);
+void insertValue(table *Table, int ind, char* value);
+void deleteValue(table *Table, int ind, int cellInd);
+void printTable(table *Table);
 
 #endif
