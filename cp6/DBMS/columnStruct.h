@@ -21,12 +21,11 @@ typedef struct column{
 
 int typeCheck(char *value);
 cell* createCell(char *value);
-void freeCell(cell* Cell);
 void insertCell(cell *Cell, column *Column);
 column* createColumn(char* columnName, int id);
-void freeColumn(column *Column);
+void freeColumn(column **Column);
 void deleteCell(column* Column, int ind);
 void printColumn(column* Column);
-char* getCharData(cell *Cell);
+void freeCell(cell **Cell);
 
 #endif

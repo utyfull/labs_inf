@@ -13,6 +13,7 @@ int main() {
     char tableName[50];
     char columnName[50];
     char command[100];
+    int ind;
 
     table *Table = NULL;
 
@@ -32,21 +33,37 @@ int main() {
             printTable(Table);
             continue;
         }
+        else if (strcmp(command, "deleteValue") == 0) {
+            scanf("%s", columnName);
+            scanf("%d", &ind);
+            for (int i = 0; i < Table->size; i++) {
+                if (strcmp(Table->columns[i]->columnName, columnName) == 0){
+                    deleteValue(Table, i, ind);
+                }
+            }
+            continue;
+        }
+        else if (strcmp(command, "deleteColumn") == 0) {
+            scanf("%s", columnName);
+            for (int i = 0; i < Table->size; i++) {
+                if (strcmp(Table->columns[i]->columnName, columnName) == 0){
+                    deleteColumn(Table, i);
+                }
+            }
+            continue;
+        }
         else if (strcmp(command, "insertValue") == 0) {
             scanf("%s", columnName);
             scanf("%s", value);
             for (int i = 0; i < Table->size; i++) {
                 if (strcmp(Table->columns[i]->columnName, columnName) == 0){
-                    insertValue(Table, i, value);
+                    insertValue(&Table, i, value);
                 }
             }
             continue;
         }
         else if (strcmp(command, "exit") == 0) {
-            if (Table != NULL) {
-            freeTable(Table);
-            free(Table);
-            }
+            freeTable(&Table);
             break;
         } else {
             printf("Invalid input\n");
