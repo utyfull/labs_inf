@@ -12,6 +12,7 @@
                 "columnAction.c",
                 "tableAction.c",
                 "io.c",
+                "fileAction.c",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
             ],
