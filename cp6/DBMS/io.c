@@ -25,12 +25,16 @@ int main() {
             continue;
         }
         else if (strcmp(command, "createColumn") == 0) {
+            if (Table != NULL) {
             scanf("%s", columnName);
-            insertColumn(columnName, &Table);;
+            insertColumn(columnName, &Table);
+            } else printf("Create Table!!!!!!!\n");
             continue;
         }
         else if (strcmp(command, "printTable") == 0) {
+            if (Table != NULL) {
             printTable(Table);
+            } else printf("Create TABLEEEEE\n");
             continue;
         }
         else if (strcmp(command, "deleteValue") == 0) {
