@@ -1,6 +1,7 @@
 
 
 #include "tableStruct.h"
+#include "fileStruct.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -29,6 +30,15 @@ int main() {
             scanf("%s", columnName);
             insertColumn(columnName, &Table);
             } else printf("Create Table!!!!!!!\n");
+            continue;
+        }
+        else if (strcmp(command, "writeData") == 0) {
+            writeTableToFile("WTF.db" ,Table);
+            continue;
+        }
+        else if (strcmp(command, "loadData") == 0) {
+            if (Table != NULL) freeTable(&Table);
+            readTableFromFile("WTF.db", &Table);
             continue;
         }
         else if (strcmp(command, "printTable") == 0) {
