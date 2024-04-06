@@ -58,6 +58,81 @@ void bubbleSort(Node* head) {
     } while (swapped);
 }
 
+void deleteNode(Node** head_ref, int position) {
+    if (*head_ref == NULL) {
+        return;
+    }
+
+    Node* temp = *head_ref;
+
+    // Если удаляемый элемент - первый
+    if (position == 0) {
+        *head_ref = temp->next;
+        free(temp);
+        return;
+    }
+
+    // Найти предыдущий узел i-го узла
+    for (int i = 0; temp != NULL && i < position - 1; i++) {
+        temp = temp->next;
+    }
+
+    // Если i больше длины списка, не делаем ничего
+    if (temp == NULL || temp->next == NULL) {
+        return;
+    }
+
+    // Удаление узла, соединение предыдущего узла с последующим
+    Node* next = temp->next->next;
+    free(temp->next);
+    temp->next = next;
+}
+
+void replaceNodeAtIndex(Node* head, int index, int new_data) {
+    Node* current = head;
+    int i = 0;
+    while (current != NULL && i < index) {
+        current = current->next;
+        i++;
+    }
+
+    if (current == NULL) {
+        printf("Индекс превышает длину списка\n");
+        return;
+    }
+
+    current->data = new_data;
+}
+
+void insertAfterIndex(Node** head_ref, int index, int new_data) {
+    if (*head_ref == NULL) {
+        printf("Список пуст\n");
+        return;
+    }
+
+    Node* current = *head_ref;
+    int i = 0;
+    while (current != NULL && i < index) {
+        current = current->next;
+        i++;
+    }
+
+    if (current == NULL) {
+        printf("Индекс превышает длину списка\n");
+        return;
+    }
+
+    Node* new_node = (Node*)malloc(sizeof(Node));
+    if (new_node == NULL) {
+        printf("Ошибка выделения памяти\n");
+        exit(1);
+    }
+
+    new_node->data = new_data;
+    new_node->next = current->next;
+    current->next = new_node;
+}
+
 // Function to print the linked list
 void printList(Node* head) {
     Node* current = head;
@@ -83,6 +158,7 @@ int main() {
     Node* head = NULL;
 
     char command[100];
+    int pos;
     int value;
 
     while (1) {
@@ -99,6 +175,23 @@ int main() {
         }
         if (strcmp(command, "printList") == 0) {
             printList(head);
+            continue;
+        }
+        if (strcmp(command, "replaceValue") == 0) {
+            scanf("%d", &pos);
+            scanf("%d", &value);
+            replaceNodeAtIndex(head, pos, value);
+            continue;
+        }
+        if (strcmp(command, "insertAfter") == 0) {
+            scanf("%d", &pos);
+            scanf("%d", &value);
+            insertAfterIndex(&head, pos, value);
+            continue;
+        }
+        if (strcmp(command, "deleteValue") == 0) {
+            scanf("%d", &pos);
+            deleteNode(&head, pos);
             continue;
         }
         if (strcmp(command, "exit") == 0) {

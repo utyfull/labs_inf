@@ -12,6 +12,8 @@ void bubbleSort(Node* head);
 void printList(Node* head);
 void freeList(Node* head);
 Node* createNode(int data);
-
+void insertAfterIndex(Node** head_ref, int index, int new_data);
+void replaceNodeAtIndex(Node* head, int index, int new_data);
+void deleteNode(Node** head_ref, int position);
 
 #endif
