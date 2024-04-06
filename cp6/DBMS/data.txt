@@ -1,0 +1,59 @@
+createTable Study
+createColumn Name
+createColumn Initials
+createColumn Gender
+createColumn Group
+createColumn Math
+createColumn Physics
+createColumn Chemistry
+createColumn History
+createColumn Literature
+insertValue Name Taylor
+insertValue Initials J.R.
+insertValue Gender Male
+insertValue Group 65
+insertValue Math 5.7
+insertValue Physics 2.0
+insertValue Chemistry 5.0
+insertValue History 3.8
+insertValue Literature 4.9
+insertValue Name Brown
+insertValue Initials E.P.
+insertValue Gender Female
+insertValue Group 35
+insertValue Math 1.9
+insertValue Physics 2.3
+insertValue Chemistry 1.7
+insertValue History 5.7
+insertValue Literature 3.3
+insertValue Name Wilson
+insertValue Initials E.Y.
+insertValue Gender Female
+insertValue Group 5
+insertValue Math 3.0
+insertValue Physics 2.5
+insertValue Chemistry 3.7
+insertValue History 2.0
+insertValue Literature 3.6
+insertValue Name Wilson
+insertValue Initials P.S.
+insertValue Gender Female
+insertValue Group 90
+insertValue Math 3.6
+insertValue Physics 1.3
+insertValue Chemistry 2.1
+insertValue History 3.5
+insertValue Literature 1.9
+insertValue Name Brown
+insertValue Initials G.S.
+insertValue Gender Female
+insertValue Group 28
+insertValue Math 5.3
+insertValue Physics 3.6
+insertValue Chemistry 2.0
+insertValue History 1.9
+insertValue Literature 3.3
+printTable
+writeData
+printTask
+exit
