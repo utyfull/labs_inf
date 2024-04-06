@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 
@@ -81,20 +82,29 @@ void freeList(Node* head) {
 int main() {
     Node* head = NULL;
 
-    // Insert nodes into the linked list
-    head = insertEnd(head, 5);
-    head = insertEnd(head, 2);
-    head = insertEnd(head, 8);
-    head = insertEnd(head, 1);
+    char command[100];
+    int value;
 
-    // Bubble sort the linked list
-    bubbleSort(head);
+    while (1) {
+        scanf("%s", command);
 
-    // Print the sorted linked list
-    printList(head);
+        if (strcmp(command, "insertEnd") == 0) {
+            scanf("%d", &value);
+            head = insertEnd(head, value);
+            continue;
+        }
+        if (strcmp(command, "bubbleSort") == 0) {
+            bubbleSort(head);
+            continue;
+        }
+        if (strcmp(command, "printList") == 0) {
+            printList(head);
+            continue;
+        }
+        if (strcmp(command, "exit") == 0) {
+            freeList(head);
+            return 0;
+        }
 
-    // Free memory allocated for the linked list
-    freeList(head);
-
-    return 0;
+    }
 }
