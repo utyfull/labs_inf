@@ -7,19 +7,19 @@
 
 
 // Функция для создания нового узла
-Node* createNode(int data) {
+Node* createNode(char* data) {
     Node* newNode = (Node*)malloc(sizeof(Node));
     if (!newNode) {
         printf("Ошибка выделения памяти\n");
         exit(1);
     }
-    newNode->data = data;
+    strcpy(newNode->data, data);
     newNode->next = NULL;
     return newNode;
 }
 
 // Функция для добавления узла в кольцевой список
-void append(Node** head, int data) {
+void append(Node** head, char* data) {
     Node* newNode = createNode(data);
     if (!*head) {
         *head = newNode;
@@ -32,6 +32,22 @@ void append(Node** head, int data) {
         temp->next = newNode;
         newNode->next = *head;
     }
+}
+
+// Функция для очистки списка
+void clearList(Node** head) {
+    if (!*head) return;
+
+    Node* current = *head;
+    Node* nextNode = NULL;
+
+    while (current->next != *head) { // Проходим по всем узлам, кроме последнего, связанного с головой
+        nextNode = current->next;
+        free(current);
+        current = nextNode;
+    }
+    free(current); // Освобождаем последний узел
+    *head = NULL; // Обнуляем указатель на голову списка
 }
 
 // Функция для перестановки первой и второй половины списка
@@ -54,6 +70,17 @@ void swapHalves(Node** head) {
     *head = fast->next; // Обновляем голову списка
 }
 
+int listLength(Node* head) {
+    int length = 0;
+    Node* current = head;
+    if (head == NULL) return 0;
+    do {
+        length++;
+        current = current->next;
+    } while (current != head);
+    return length;
+}
+
 // Функция для печати списка
 void printList(Node* head) {
     if (!head) return;
@@ -69,29 +96,27 @@ int main() {
     Node* head = NULL;
 
     char command[100];
-
-    append(&head, 1);
-    append(&head, 2);
-    append(&head, 3);
-    append(&head, 4);
-    append(&head, 5);
-    append(&head, 6);
-
+    unsigned char* value;
 
     while (1) {
-        
         scanf("%s", command);
 
-        if ()
+        if (strcmp(command, "insertValue") == 0) {
+            scanf("%s", value);
+            append(&head, value);
+            continue;
+        }
+        if (strcmp(command, "printList") == 0) {
+            printList(head);
+            continue;
+        }
+        if (strcmp(command, "deleteValue") == 0) {
+            continue;
+        }
+        if (strcmp(command, "exit") == 0) {
+            clearList(&head);
+            return 0;
+        }
+
     }
-
-    printf("Исходный список:\n");
-    printList(head);
-
-    swapHalves(&head);
-
-    printf("Список после перестановки половин:\n");
-    printList(head);
-
-    return 0;
 }
