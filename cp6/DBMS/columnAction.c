@@ -31,7 +31,7 @@ int typeCheck(char *value) {
     while (value[iter]) {
         if (isalpha(value[iter])) {
             flag = 2;
-        } else if (value[iter] == '.') {
+        } else if (value[iter] == '.' && flag != 2) {
             flag = 1;
         }
         iter++;
