@@ -31,9 +31,19 @@ Node* insertEnd(Node* head, int data) {
     return head;
 }
 
+void bubbleHelp(Node **ptr, int *temp, int *swapped) {
+    if ((*ptr)->data > (*ptr)->next->data) {
+            *temp = (*ptr)->data;
+            (*ptr)->data = (*ptr)->next->data;
+            (*ptr)->next->data = *temp;
+            *swapped = 1;
+        }
+}
+
+
 // Bubble sort function for linked list
 void bubbleSort(Node* head) {
-    int swapped, temp;
+    int swapped, temp = 0;
     Node* ptr;
     Node* lptr = NULL;
 
@@ -46,13 +56,8 @@ void bubbleSort(Node* head) {
         ptr = head;
 
         while (ptr->next != lptr) {
-            if (ptr->data > ptr->next->data) {
-                temp = ptr->data;
-                ptr->data = ptr->next->data;
-                ptr->next->data = temp;
-                swapped = 1;
-            }
-            ptr = ptr->next;
+            bubbleHelp(&ptr, &temp, &swapped);
+        ptr = ptr->next;
         }
         lptr = ptr;
     } while (swapped);
