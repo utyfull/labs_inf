@@ -116,6 +116,7 @@ token getNextToken(lexer **Lexer) {
         } else {
             Token.type = ERROR;
             strcpy(Token.lexeme, "Wrong comment");
+            (*Lexer)->position = strlen((*Lexer)->input);
         }
     } else if (isdigit(currentChar)) {
         // Токен является числовым литералом
@@ -180,7 +181,7 @@ int main() {
     // Test Lexer
     token* tokenList = malloc(sizeof(token) * 20);
     char *input = 
-    "DELETE FROM table_name\n"
+    "/*DELETE FROM table_name\n"
     "WHERE i < b;";
     lexer *Lexer = createLexer(input);
     int i = 0;
