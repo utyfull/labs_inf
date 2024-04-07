@@ -29,7 +29,7 @@ token getNextToken(lexer **Lexer) {
     }
     if (currentChar == ',') {
         // Токен является символом ","
-        Token.type = SYMBOL;
+        Token.type = COMMA;
         Token.lexeme[0] = currentChar;
         Token.lexeme[1] = '\0';
         (*Lexer)->position++;
@@ -38,7 +38,7 @@ token getNextToken(lexer **Lexer) {
 
     } else if (currentChar == ';') {
         // Токен является символом ","
-        Token.type = SYMBOL;
+        Token.type = SEMICOLON;
         Token.lexeme[0] = currentChar;
         Token.lexeme[1] = '\0';
         (*Lexer)->position++;
@@ -69,21 +69,14 @@ token getNextToken(lexer **Lexer) {
 
         for (int k = 0; k < NUM_KEYWORDS; k++) {
             if (strcmp(Token.lexeme, keyWords[k]) == 0) {
-                Token.type = KEYWORD;
-                break;
-            }
-        }
-
-        for (int k = 0; k < NUM_DATATYPES; k++) {
-            if (strcmp(Token.lexeme, dataTypes[k]) == 0) {
-                Token.type = DATATYPE;
+                Token.type = (tokenType)keyWords[k];
                 break;
             }
         }
 
         for (int k = 0; k < NUM_KEYPHRASES; k++) {
             if (strcmp(Token.lexeme, keyPhrases[k]) == 0) {
-                Token.type = KEYPHRASE;
+                Token.type = (tokenType)keyPhrases[k];
                 break;
             }
         }
@@ -120,7 +113,7 @@ token getNextToken(lexer **Lexer) {
         }
     } else if (isdigit(currentChar)) {
         // Токен является числовым литералом
-        Token.type = LITERAL;
+        Token.type = NUMBER;
         int i = 0;
         while (isdigit(currentChar) || currentChar == '.') {
             Token.lexeme[i++] = currentChar;
@@ -132,7 +125,7 @@ token getNextToken(lexer **Lexer) {
 
     } else if (currentChar == '\'' || currentChar == '"') {
         // Токен является строковым литералом
-        Token.type = LITERAL;
+        Token.type = STRING;
         int i = 0;
         char quoteChar = currentChar;
         Token.lexeme[i++] = currentChar;
@@ -153,18 +146,36 @@ token getNextToken(lexer **Lexer) {
     }  else if (currentChar == '=' || currentChar == '<' || currentChar == '>' || currentChar == '!') {
         // Token yavlyetsya operatorom
         int i = 0;
-        Token.type = OPERATOR;
+        if (currentChar == '=') {
+            Token.type = ERROR;
+        } else if (currentChar == '<') {
+            Token.type = LESS_THAN;
+        } else if (currentChar == '>') {
+            Token.type = GREATER_THAN;
+        } else if (currentChar == '!') {
+            Token.type = ERROR;
+        }
         Token.lexeme[i++] = currentChar;
         (*Lexer)->position++;
         currentChar = (*Lexer)->input[(*Lexer)->position];
         if ((currentChar == '=' && (Token.lexeme[0] == '=' || Token.lexeme[0] == '<' || Token.lexeme[0] == '>' || Token.lexeme[0] == '!'))) {
+            if (currentChar == '=' && Token.lexeme[0] == '=') {
+                Token.type = EQUAL;
+            } else if (currentChar == '=' && Token.lexeme[0] == '<') {
+                Token.type = LESS_THAN_OR_EQUAL;
+            } else if (currentChar == '=' && Token.lexeme[0] == '>') {
+                Token.type = GREATER_THAN_OR_EQUAL;
+            } else if (currentChar == '=' && Token.lexeme[0] == '!') {
+                Token.type = NOT_EQUAL;
+            } else {
+                Token.type = ERROR;
+            }
             Token.lexeme[i++] = currentChar;
             (*Lexer)->position++;
         }
         Token.lexeme[i] = '\0';
 
-
-    }  else {
+    } else {
         // ERROR huy znaet chto token
         Token.type = ERROR;
         Token.lexeme[0] = currentChar;
@@ -181,13 +192,12 @@ int main() {
     // Test Lexer
     token* tokenList = malloc(sizeof(token) * 20);
     char *input = 
-    "/*DELETE FROM table_name\n"
+    "DELETE FROM table_name\n"
     "WHERE i < b;";
     lexer *Lexer = createLexer(input);
     int i = 0;
     while (Lexer->position < strlen(Lexer->input)) {
         tokenList[i] = getNextToken(&Lexer);
-        if (tokenList[i].type == ERROR) printf("ERROR\n");
         printf("%s - value\n", tokenList[i].lexeme);
         i++;
     }
