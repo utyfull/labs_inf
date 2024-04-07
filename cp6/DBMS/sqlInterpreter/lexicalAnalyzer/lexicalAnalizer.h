@@ -3,6 +3,7 @@
 
 #define NUM_KEYWORDS 19
 #define NUM_KEYPHRASES 7
+#define NUM_OPERATORS 5
 
 typedef enum {
     SELECT,         // "SELECT"
@@ -49,7 +50,10 @@ typedef enum {
     VARIABLE,       // переменная
     FUNCTION,       // функция
     TRIGGER,        // триггер
-    ERROR           // ошибка
+    ERROR,           // ошибка
+    QUERY,         // start AST
+    COLUMN,       // Column
+    TABLE        // Table
 } tokenType;
 
 typedef struct {
@@ -70,6 +74,11 @@ const char* keyWords[] = {
 
 const char* keyPhrases[] = {
     "EXISTS", "IN", "ANY", "ALL", "EXCEPT", "INTERSECT", "LIKE", "BETWEEN"
+};
+
+const char* operatorsList[] = {
+    "EQUAL", "NOT_EQUAL", "LESS_THAN", "GREATER_THAN", "LESS_THAN_OR_EQUAL",
+    "GREATER_THAN_OR_EQUAL"
 };
 
 lexer* createLexer(char *input);

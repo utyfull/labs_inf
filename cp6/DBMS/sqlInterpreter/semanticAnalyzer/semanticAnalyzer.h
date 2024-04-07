@@ -4,8 +4,17 @@
 #include "../lexicalAnalyzer/lexicalAnalizer.h"
 
 
+typedef struct ASTNode {
+    tokenType type;
+    char lexeme[100];
+    ASTNode *children[5];
+    int numChildren;
+} ASTNode;
 
 
+ASTNode *createASTNode(tokenType type, const char* lexeme);
+void freeAST(ASTNode** root);
+ASTNode* parse(token* tokenList, int numTokens);
 
 
 #endif

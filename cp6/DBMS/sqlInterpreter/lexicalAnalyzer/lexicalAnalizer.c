@@ -201,5 +201,6 @@ int main() {
         printf("%s - value\n", tokenList[i].lexeme);
         i++;
     }
+    int tokenLen = i;
     destroyLexer(&Lexer);
 }
