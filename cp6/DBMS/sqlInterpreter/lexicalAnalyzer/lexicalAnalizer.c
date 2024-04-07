@@ -1,5 +1,5 @@
 
-#include "semanticAnalizer.h"
+#include "lexicalAnalizer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
