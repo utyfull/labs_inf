@@ -7,7 +7,7 @@
 typedef struct ASTNode {
     tokenType type;
     char lexeme[100];
-    ASTNode *children[5];
+    ASTNode *children[20];
     int numChildren;
 } ASTNode;
 

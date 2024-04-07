@@ -1,7 +1,7 @@
 #ifndef _SEMANTIC_ANALIZER_H_
 #define _SEMANTIC_ANALIZER_H_
 
-#define NUM_KEYWORDS 19
+#define NUM_KEYWORDS 22
 #define NUM_KEYPHRASES 7
 #define NUM_OPERATORS 5
 
@@ -27,11 +27,16 @@ typedef enum {
     BETWEEN,        // "BETWEEN"
     UNION,          // "UNION"
     ALL,            // "ALL"
+    INTO,           // INTO
+    VALUES,          // VALUES
     DISTINCT,       // "DISTINCT"
+    VALUES_LIST,    // VALUES LIST
+    SET,            // SET
     IDENTIFIER,     // идентификатор (название таблицы, столбца и т.д.)
     STRING,         // строковый литерал
     NUMBER,         // числовой литерал
-    EQUAL,          // "=="
+    EQUAL,          // =
+    EQUAL_TO,          // "=="
     NOT_EQUAL,      // "!="
     LESS_THAN,      // "<"
     GREATER_THAN,   // ">"
@@ -69,7 +74,7 @@ typedef struct {
 const char* keyWords[] = {
     "SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "WHERE", "JOIN",
     "INNER", "OUTER", "LEFT", "RIGHT", "ON", "GROUPBY", "ORDERBY", "HAVING",
-    "LIMIT", "AND", "OR", "NOT"
+    "LIMIT", "AND", "OR", "NOT", "INTO", "VALUES", "SET"
 };
 
 const char* keyPhrases[] = {

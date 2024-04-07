@@ -44,6 +44,20 @@ token getNextToken(lexer **Lexer) {
         (*Lexer)->position++;
 
 
+    } else if (currentChar == '(') {
+        // Токен является символом "("
+        Token.type = LEFT_PARENTHESIS;
+        Token.lexeme[0] = currentChar;
+        Token.lexeme[1] = '\0';
+        (*Lexer)->position++;
+
+    } else if (currentChar == ')') {
+        // Токен является символом ")"
+        Token.type = RIGHT_PARENTHESIS;
+        Token.lexeme[0] = currentChar;
+        Token.lexeme[1] = '\0';
+        (*Lexer)->position++;
+
     }
 
     // Определить тип токена на основе текущего символа
@@ -147,7 +161,7 @@ token getNextToken(lexer **Lexer) {
         // Token yavlyetsya operatorom
         int i = 0;
         if (currentChar == '=') {
-            Token.type = ERROR;
+            Token.type = EQUAL;
         } else if (currentChar == '<') {
             Token.type = LESS_THAN;
         } else if (currentChar == '>') {
@@ -160,7 +174,7 @@ token getNextToken(lexer **Lexer) {
         currentChar = (*Lexer)->input[(*Lexer)->position];
         if ((currentChar == '=' && (Token.lexeme[0] == '=' || Token.lexeme[0] == '<' || Token.lexeme[0] == '>' || Token.lexeme[0] == '!'))) {
             if (currentChar == '=' && Token.lexeme[0] == '=') {
-                Token.type = EQUAL;
+                Token.type = EQUAL_TO;
             } else if (currentChar == '=' && Token.lexeme[0] == '<') {
                 Token.type = LESS_THAN_OR_EQUAL;
             } else if (currentChar == '=' && Token.lexeme[0] == '>') {
