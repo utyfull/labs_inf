@@ -6,66 +6,79 @@
 #include <string.h>
 #include <ctype.h>
 
-
-lexer* createLexer(char *input) {
+lexer *createLexer(char *input)
+{
     lexer *Lexer = malloc(sizeof(lexer));
     Lexer->input = input;
     Lexer->position = 0;
     return Lexer;
 }
 
-void destroyLexer(lexer **Lexer) {
+void destroyLexer(lexer **Lexer)
+{
     free(*Lexer);
 }
 
-token getNextToken(lexer **Lexer) {
+token getNextToken(lexer **Lexer)
+{
     token Token;
     char currentChar = (*Lexer)->input[(*Lexer)->position];
 
     // Пропустить пробелы и символы новой строки
-    while (currentChar == ' ' || currentChar == '\n') {
+    while (currentChar == ' ' || currentChar == '\n')
+    {
         (*Lexer)->position++;
         currentChar = (*Lexer)->input[(*Lexer)->position];
     }
-    if (currentChar == ',') {
+    if (currentChar == ',')
+    {
         // Токен является символом ","
         Token.type = COMMA;
         Token.lexeme[0] = currentChar;
         Token.lexeme[1] = '\0';
         (*Lexer)->position++;
-        
-
-
-    } else if (currentChar == ';') {
+    }
+    else if (currentChar == ';')
+    {
         // Токен является символом ","
         Token.type = SEMICOLON;
         Token.lexeme[0] = currentChar;
         Token.lexeme[1] = '\0';
         (*Lexer)->position++;
-
-
-    } else if (currentChar == '(') {
+    }
+    else if (currentChar == '(')
+    {
         // Токен является символом "("
         Token.type = LEFT_PARENTHESIS;
         Token.lexeme[0] = currentChar;
         Token.lexeme[1] = '\0';
         (*Lexer)->position++;
-
-    } else if (currentChar == ')') {
+    }
+    else if (currentChar == ')')
+    {
         // Токен является символом ")"
         Token.type = RIGHT_PARENTHESIS;
         Token.lexeme[0] = currentChar;
         Token.lexeme[1] = '\0';
         (*Lexer)->position++;
-
+    }
+    else if (currentChar == '*')
+    {
+        // Токен является символом ")"
+        Token.type = ALL;
+        Token.lexeme[0] = currentChar;
+        Token.lexeme[1] = '\0';
+        (*Lexer)->position++;
     }
 
     // Определить тип токена на основе текущего символа
-    else if (isalpha(currentChar) || currentChar == '_') {
+    else if (isalpha(currentChar) || currentChar == '_')
+    {
         // Токен является идентификатором (именем таблицы, столбца и т. д.)
         Token.type = IDENTIFIER;
         int i = 0;
-        while (isalnum(currentChar) || currentChar == '_') {
+        while (isalnum(currentChar) || currentChar == '_')
+        {
             Token.lexeme[i++] = currentChar;
             (*Lexer)->position++;
             currentChar = (*Lexer)->input[(*Lexer)->position];
@@ -74,70 +87,88 @@ token getNextToken(lexer **Lexer) {
 
         // Udalenie probelov i proverka na keyword
         int j = 0;
-        for (i = 0; Token.lexeme[i] != '\0'; i++) {
-            if (!isspace(Token.lexeme[i])) {
+        for (i = 0; Token.lexeme[i] != '\0'; i++)
+        {
+            if (!isspace(Token.lexeme[i]))
+            {
                 Token.lexeme[j++] = Token.lexeme[i];
             }
         }
         Token.lexeme[i] = '\0';
 
-        for (int k = 0; k < NUM_KEYWORDS; k++) {
-            if (strcmp(Token.lexeme, keyWords[k]) == 0) {
+        for (int k = 0; k < NUM_KEYWORDS; k++)
+        {
+            if (strcmp(Token.lexeme, keyWords[k]) == 0)
+            {
                 Token.type = (tokenType)keyWords[k];
                 break;
             }
         }
 
-        for (int k = 0; k < NUM_KEYPHRASES; k++) {
-            if (strcmp(Token.lexeme, keyPhrases[k]) == 0) {
+        for (int k = 0; k < NUM_KEYPHRASES; k++)
+        {
+            if (strcmp(Token.lexeme, keyPhrases[k]) == 0)
+            {
                 Token.type = (tokenType)keyPhrases[k];
                 break;
             }
         }
 
-    } else if (currentChar == '-' && (*Lexer)->input[(*Lexer)->position + 1] == '-') {
+        if (strcmp(Token.lexeme, "TABLE") == 0)
+            Token.type = TABLE_DDL;
+        if (strcmp(Token.lexeme, "COLUMN") == 0)
+            Token.type = COLUMN_DDL;
+    }
+    else if (currentChar == '-' && (*Lexer)->input[(*Lexer)->position + 1] == '-')
+    {
         // Proverka na odnostrochniy comment
         int i = -1;
         (*Lexer)->position++;
         while (1)
         {
-            if (currentChar == '\n') break;
+            if (currentChar == '\n')
+                break;
             Token.lexeme[i++] = currentChar;
             (*Lexer)->position++;
             currentChar = (*Lexer)->input[(*Lexer)->position];
-        } 
+        }
         Token.type = COMMENT;
         Token.lexeme[i] = '\0';
-
-
-    } else if (currentChar == '/' && (*Lexer)->input[(*Lexer)->position + 1] == '*') {
+    }
+    else if (currentChar == '/' && (*Lexer)->input[(*Lexer)->position + 1] == '*')
+    {
         // Proverka na mnogostrochniy comment
         char *endComment = strstr((*Lexer)->input, "*/");
-        if (endComment) {
+        if (endComment)
+        {
             Token.type = COMMENT;
             strncpy(Token.lexeme, (*Lexer)->input, endComment - (*Lexer)->input + 2);
             Token.lexeme[endComment - (*Lexer)->input + 2] = '\0';
 
             (*Lexer)->position = endComment - (*Lexer)->input + 2;
-            
-        } else {
+        }
+        else
+        {
             Token.type = ERROR;
             strcpy(Token.lexeme, "Wrong comment");
             (*Lexer)->position = strlen((*Lexer)->input);
         }
-    } else if (isdigit(currentChar)) {
+    }
+    else if (isdigit(currentChar))
+    {
         // Токен является числовым литералом
         Token.type = NUMBER;
         int i = 0;
-        while (isdigit(currentChar) || currentChar == '.') {
+        while (isdigit(currentChar) || currentChar == '.')
+        {
             Token.lexeme[i++] = currentChar;
             (*Lexer)->position++;
             currentChar = (*Lexer)->input[(*Lexer)->position];
         }
         Token.lexeme[i] = '\0';
-
-
-    } else if (currentChar == '\'' || currentChar == '"') {
+    }
+    else if (currentChar == '\'' || currentChar == '"')
+    {
         // Токен является строковым литералом
         Token.type = STRING;
         int i = 0;
@@ -145,51 +176,71 @@ token getNextToken(lexer **Lexer) {
         Token.lexeme[i++] = currentChar;
         (*Lexer)->position++;
         currentChar = (*Lexer)->input[(*Lexer)->position];
-        while (currentChar != '\0' && currentChar != quoteChar) {
+        while (currentChar != '\0' && currentChar != quoteChar)
+        {
             Token.lexeme[i++] = currentChar;
             (*Lexer)->position++;
             currentChar = (*Lexer)->input[(*Lexer)->position];
         }
-        if (currentChar == quoteChar) {
+        if (currentChar == quoteChar)
+        {
             Token.lexeme[i++] = currentChar;
             (*Lexer)->position++;
         }
         Token.lexeme[i] = '\0';
-
-
-    }  else if (currentChar == '=' || currentChar == '<' || currentChar == '>' || currentChar == '!') {
+    }
+    else if (currentChar == '=' || currentChar == '<' || currentChar == '>' || currentChar == '!')
+    {
         // Token yavlyetsya operatorom
         int i = 0;
-        if (currentChar == '=') {
+        if (currentChar == '=')
+        {
             Token.type = EQUAL;
-        } else if (currentChar == '<') {
+        }
+        else if (currentChar == '<')
+        {
             Token.type = LESS_THAN;
-        } else if (currentChar == '>') {
+        }
+        else if (currentChar == '>')
+        {
             Token.type = GREATER_THAN;
-        } else if (currentChar == '!') {
+        }
+        else if (currentChar == '!')
+        {
             Token.type = ERROR;
         }
         Token.lexeme[i++] = currentChar;
         (*Lexer)->position++;
         currentChar = (*Lexer)->input[(*Lexer)->position];
-        if ((currentChar == '=' && (Token.lexeme[0] == '=' || Token.lexeme[0] == '<' || Token.lexeme[0] == '>' || Token.lexeme[0] == '!'))) {
-            if (currentChar == '=' && Token.lexeme[0] == '=') {
+        if ((currentChar == '=' && (Token.lexeme[0] == '=' || Token.lexeme[0] == '<' || Token.lexeme[0] == '>' || Token.lexeme[0] == '!')))
+        {
+            if (currentChar == '=' && Token.lexeme[0] == '=')
+            {
                 Token.type = EQUAL_TO;
-            } else if (currentChar == '=' && Token.lexeme[0] == '<') {
+            }
+            else if (currentChar == '=' && Token.lexeme[0] == '<')
+            {
                 Token.type = LESS_THAN_OR_EQUAL;
-            } else if (currentChar == '=' && Token.lexeme[0] == '>') {
+            }
+            else if (currentChar == '=' && Token.lexeme[0] == '>')
+            {
                 Token.type = GREATER_THAN_OR_EQUAL;
-            } else if (currentChar == '=' && Token.lexeme[0] == '!') {
+            }
+            else if (currentChar == '=' && Token.lexeme[0] == '!')
+            {
                 Token.type = NOT_EQUAL;
-            } else {
+            }
+            else
+            {
                 Token.type = ERROR;
             }
             Token.lexeme[i++] = currentChar;
             (*Lexer)->position++;
         }
         Token.lexeme[i] = '\0';
-
-    } else {
+    }
+    else
+    {
         // ERROR huy znaet chto token
         Token.type = ERROR;
         Token.lexeme[0] = currentChar;
@@ -200,17 +251,17 @@ token getNextToken(lexer **Lexer) {
     return Token;
 }
 
-
-
-int main() {
+int main()
+{
     // Test Lexer
-    token* tokenList = malloc(sizeof(token) * 20);
-    char *input = 
-    "DELETE FROM table_name\n"
-    "WHERE i < b;";
+    token *tokenList = malloc(sizeof(token) * 20);
+    char *input =
+        "DELETE FROM table_name\n"
+        "WHERE i < b;";
     lexer *Lexer = createLexer(input);
     int i = 0;
-    while (Lexer->position < strlen(Lexer->input)) {
+    while (Lexer->position < strlen(Lexer->input))
+    {
         tokenList[i] = getNextToken(&Lexer);
         printf("%s - value\n", tokenList[i].lexeme);
         i++;
