@@ -27,9 +27,27 @@ token getNextToken(lexer **Lexer) {
         (*Lexer)->position++;
         currentChar = (*Lexer)->input[(*Lexer)->position];
     }
+    if (currentChar == ',') {
+        // Токен является символом ","
+        Token.type = SYMBOL;
+        Token.lexeme[0] = currentChar;
+        Token.lexeme[1] = '\0';
+        (*Lexer)->position++;
+        
+
+
+    } else if (currentChar == ';') {
+        // Токен является символом ","
+        Token.type = SYMBOL;
+        Token.lexeme[0] = currentChar;
+        Token.lexeme[1] = '\0';
+        (*Lexer)->position++;
+
+
+    }
 
     // Определить тип токена на основе текущего символа
-    if (isalpha(currentChar) || currentChar == '_') {
+    else if (isalpha(currentChar) || currentChar == '_') {
         // Токен является идентификатором (именем таблицы, столбца и т. д.)
         Token.type = IDENTIFIER;
         int i = 0;
@@ -72,14 +90,16 @@ token getNextToken(lexer **Lexer) {
 
     } else if (currentChar == '-' && (*Lexer)->input[(*Lexer)->position + 1] == '-') {
         // Proverka na odnostrochniy comment
-        int i = 0;
+        int i = -1;
         (*Lexer)->position++;
-        do {
+        while (1)
+        {
+            if (currentChar == '\n') break;
             Token.lexeme[i++] = currentChar;
             (*Lexer)->position++;
             currentChar = (*Lexer)->input[(*Lexer)->position];
-        }
-         while (currentChar != '\n');
+        } 
+        Token.type = COMMENT;
         Token.lexeme[i] = '\0';
 
 
@@ -92,6 +112,10 @@ token getNextToken(lexer **Lexer) {
             Token.lexeme[endComment - (*Lexer)->input + 2] = '\0';
 
             (*Lexer)->position = endComment - (*Lexer)->input + 2;
+            
+        } else {
+            Token.type = ERROR;
+            strcpy(Token.lexeme, "Wrong comment");
         }
     } else if (isdigit(currentChar)) {
         // Токен является числовым литералом
@@ -125,15 +149,7 @@ token getNextToken(lexer **Lexer) {
         Token.lexeme[i] = '\0';
 
 
-    } else if (currentChar == ',') {
-        // Токен является символом ","
-        Token.type = SYMBOL;
-        Token.lexeme[0] = currentChar;
-        Token.lexeme[1] = '\0';
-        (*Lexer)->position++;
-
-
-    } else if (currentChar == '=' || currentChar == '<' || currentChar == '>' || currentChar == '!') {
+    }  else if (currentChar == '=' || currentChar == '<' || currentChar == '>' || currentChar == '!') {
         // Token yavlyetsya operatorom
         int i = 0;
         Token.type = OPERATOR;
@@ -147,7 +163,7 @@ token getNextToken(lexer **Lexer) {
         Token.lexeme[i] = '\0';
 
 
-    } else {
+    }  else {
         // ERROR huy znaet chto token
         Token.type = ERROR;
         Token.lexeme[0] = currentChar;
@@ -165,12 +181,12 @@ int main() {
     token* tokenList = malloc(sizeof(token) * 20);
     char *input = 
     "DELETE FROM table_name\n"
-    "WHERE condition;";
+    "WHERE i < b;";
     lexer *Lexer = createLexer(input);
     int i = 0;
-    while (Lexer->position != strlen(Lexer->input) - 1) {
+    while (Lexer->position < strlen(Lexer->input)) {
         tokenList[i] = getNextToken(&Lexer);
-        if (tokenList[i].type == KEYWORD) printf("keyword\n");
+        if (tokenList[i].type == ERROR) printf("ERROR\n");
         printf("%s - value\n", tokenList[i].lexeme);
         i++;
     }
