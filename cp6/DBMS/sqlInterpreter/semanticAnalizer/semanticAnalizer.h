@@ -1,7 +1,9 @@
 #ifndef _SEMANTIC_ANALYZER_H_
 #define _SEMANTIC_ANALYZER_H_
 
-#include "../lexicalAnalyzer/lexicalAnalizer.h"
+#include "../lexicalAnalizer/lexicalAnalizer.h"
+
+typedef struct ASTNode ASTNode;
 
 typedef struct ASTNode
 {
@@ -14,5 +16,6 @@ typedef struct ASTNode
 ASTNode *createASTNode(tokenType type, const char *lexeme);
 void freeAST(ASTNode **root);
 ASTNode *parse(token *tokenList, int numTokens);
+void printASTNode(ASTNode *node, int depth);
 
 #endif

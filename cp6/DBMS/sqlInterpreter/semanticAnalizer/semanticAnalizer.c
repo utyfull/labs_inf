@@ -1,5 +1,5 @@
 
-#include "semanticAnalyzer.h"
+#include "semanticAnalizer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +10,7 @@ ASTNode *createASTNode(tokenType type, const char *lexeme)
     ASTNode *node = (ASTNode *)malloc(sizeof(ASTNode));
     if (node == NULL)
     {
-        fprinf(stderr, "ERROR MEMORY ALLOC");
+        fprintf(stderr, "ERROR MEMORY ALLOC");
         exit(EXIT_FAILURE);
     }
     node->type = type;
@@ -25,7 +25,7 @@ void freeAST(ASTNode **root)
     if (root == NULL)
         return;
     for (int i = 0; i < (*root)->numChildren; i++)
-        freeAST((*root)->children[i]);
+        freeAST(&(*root)->children[i]);
     free(root);
 }
 
@@ -41,16 +41,37 @@ ASTNode *parse(token *tokenList, int numTokens)
     {
         token currentToken = tokenList[currentTokenIndex];
 
+        if (currentToken.type == SEMICOLON)
+        {
+            break;
+        }
+        else if (currentToken.type == COMMENT)
+        {
+            currentTokenIndex++;
+            continue;
+        }
         // If SELECT
-        if (currentToken.type == SELECT)
+        else if (currentToken.type == SELECT)
         {
             ASTNode *selectNode = createASTNode(SELECT, "SELECT");
 
             currentTokenIndex++;
 
+            if (tokenList[currentTokenIndex].type == DISTINCT)
+            {
+                ASTNode *distinctNode = createASTNode(DISTINCT, tokenList[currentTokenIndex].lexeme);
+                selectNode->children[selectNode->numChildren++] = distinctNode;
+                currentTokenIndex++;
+            }
+
             // Column list
             while (currentTokenIndex < numTokens && tokenList[currentTokenIndex].type != FROM)
             {
+                if (tokenList[currentTokenIndex].type == COMMA)
+                {
+                    currentTokenIndex++;
+                    continue;
+                }
                 ASTNode *columnNode = createASTNode(COLUMN, tokenList[currentTokenIndex].lexeme);
                 selectNode->children[selectNode->numChildren++] = columnNode;
                 currentTokenIndex++;
@@ -70,6 +91,10 @@ ASTNode *parse(token *tokenList, int numTokens)
             while (currentTokenIndex < numTokens && tokenList[currentTokenIndex].type != WHERE)
             {
 
+                if (tokenList[currentTokenIndex].type == SEMICOLON)
+                {
+                    break;
+                }
                 ASTNode *tableNode = createASTNode(TABLE, tokenList[currentTokenIndex].lexeme);
                 fromNode->children[fromNode->numChildren++] = tableNode;
 
@@ -94,9 +119,10 @@ ASTNode *parse(token *tokenList, int numTokens)
                 // If operator (<, == , != i t. d.)
                 for (int i = 0; i < NUM_OPERATORS; i++)
                 {
-                    if (strcmp(currentToken.type, (tokenType)operatorsList[i]) == 0)
+                    if (currentToken.type == operatorsList[i].type)
                     {
-                        ASTNode *compressionNode = createASTNode((tokenType)operatorsList[i], currentToken.lexeme);
+
+                        ASTNode *compressionNode = createASTNode(operatorsList[i].type, currentToken.lexeme);
                         whereNode->children[whereNode->numChildren++] = compressionNode;
                         flag = 1;
 
@@ -119,7 +145,7 @@ ASTNode *parse(token *tokenList, int numTokens)
                 {
 
                     ASTNode *wtfNode = createASTNode(currentToken.type, currentToken.lexeme);
-                    whereNode->children[whereNode->numChildren - 1]->children[1] = wtfNode;
+                    whereNode->children[whereNode->numChildren++] = wtfNode;
 
                     currentTokenIndex++;
                 }
@@ -322,17 +348,18 @@ ASTNode *parse(token *tokenList, int numTokens)
         {
 
             ASTNode *createNode = createASTNode(CREATE, "CREATE");
-
             currentTokenIndex++;
 
-            if (tokenList[currentTokenIndex].type != INDEX || tokenList[currentTokenIndex].type != TABLE_DDL || tokenList[currentTokenIndex].type != COLUMN_DDL || tokenList[currentTokenIndex].type != VIEW)
+            if (tokenList[currentTokenIndex].type != INDEX && tokenList[currentTokenIndex].type != TABLE_DDL && tokenList[currentTokenIndex].type != COLUMN_DDL && tokenList[currentTokenIndex].type != VIEW)
             {
-                fprintf(stderr, "ERROR: NEED STRUCTURE AFTER CREATE");
+                fprintf(stderr, "ERROR: NEED STRUCTURE AFTER CREATE\n");
                 exit(EXIT_FAILURE);
             }
 
-            ASTNode *createObject = createASTNode(tokenList[currentTokenIndex].type, tokenList[currentTokenIndex].lexeme);
+            ASTNode *createObjectBig = createASTNode(tokenList[currentTokenIndex].type, tokenList[currentTokenIndex].lexeme);
+            currentTokenIndex++;
 
+            ASTNode *createObject = createASTNode(tokenList[currentTokenIndex].type, tokenList[currentTokenIndex].lexeme);
             currentTokenIndex++;
 
             if (tokenList[currentTokenIndex].type != LEFT_PARENTHESIS)
@@ -340,10 +367,9 @@ ASTNode *parse(token *tokenList, int numTokens)
                 fprintf(stderr, "Ошибка: Ожидалась открывающая скобка перед списком значений\n");
                 exit(EXIT_FAILURE);
             }
+            currentTokenIndex++;
 
             ASTNode *valuesListNode = createASTNode(VALUES_LIST, "VALUES_LIST");
-
-            (currentTokenIndex)++;
 
             while (currentTokenIndex < numTokens)
             {
@@ -381,7 +407,8 @@ ASTNode *parse(token *tokenList, int numTokens)
             }
 
             createObject->children[createObject->numChildren++] = valuesListNode;
-            createNode->children[createNode->numChildren++] = createObject;
+            createObjectBig->children[createObjectBig->numChildren++] = createObject;
+            createNode->children[createNode->numChildren++] = createObjectBig;
             if (tokenList[currentTokenIndex].type != RIGHT_PARENTHESIS)
             {
                 fprintf(stderr, "Ошибка: Ожидалась закрывающая скобка после списка значений\n");
@@ -390,14 +417,58 @@ ASTNode *parse(token *tokenList, int numTokens)
             root->children[root->numChildren++] = createNode;
             currentTokenIndex++;
         }
+        else if (currentToken.type == ORDERBY)
+        {
+            ASTNode *orderBy = createASTNode(ORDERBY, "ORDERBY");
+            currentTokenIndex++;
 
+            while (tokenList[currentTokenIndex].type != DESC)
+        }
         else
         {
             // Errors
             fprintf(stderr, "ERROR: WRONG TOKEN: %s\n", currentToken.lexeme);
             exit(EXIT_FAILURE);
         }
+
+        return root;
+    }
+}
+
+void printASTNode(ASTNode *node, int depth)
+{
+    for (int i = 0; i < depth; ++i)
+    {
+        printf("  ");
     }
 
-    return root;
+    printf("Type: %d, Lexeme: %s\n", node->type, node->lexeme);
+
+    for (int i = 0; i < node->numChildren; ++i)
+    {
+        printASTNode(node->children[i], depth + 1);
+    }
+}
+
+int main()
+{
+    // Test Lexer
+    token *tokenList = malloc(sizeof(token) * 20);
+    char *input =
+        "SELECT * FROM TableName WHERE a < b ORDERBY column1;";
+
+    lexer *Lexer = createLexer(input);
+    int i = 0;
+    while (Lexer->position < strlen(Lexer->input))
+    {
+        tokenList[i] = getNextToken(&Lexer);
+        printf("%s - value, %d - type\n", tokenList[i].lexeme, tokenList[i].type);
+        i++;
+    }
+    printf("-----------------------\n");
+    int tokenLen = i;
+    // Test parser
+    ASTNode *root = parse(tokenList, tokenLen);
+    printASTNode(root, 0);
+    destroyLexer(&Lexer);
 }

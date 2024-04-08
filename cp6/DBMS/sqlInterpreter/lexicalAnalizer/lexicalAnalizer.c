@@ -6,6 +6,15 @@
 #include <string.h>
 #include <ctype.h>
 
+const TypeMapping keyWords[] = {
+    {"SELECT", SELECT}, {"INSERT", INSERT}, {"UPDATE", UPDATE}, {"DELETE", DELETE}, {"FROM", FROM}, {"WHERE", WHERE}, {"JOIN", JOIN}, {"INNER", INNER}, {"OUTER", OUTER}, {"LEFT", LEFT}, {"RIGHT", RIGHT}, {"ON", ON}, {"GROUPBY", GROUPBY}, {"ORDERBY", ORDERBY}, {"HAVING", HAVING}, {"LIMIT", LIMIT}, {"AND", AND}, {"OR", OR}, {"NOT", NOT}, {"INTO", INTO}, {"VALUES", VALUES}, {"SET", SET}, {"CREATE", CREATE}, {"ALTER", ALTER}, {"INDEX", INDEX}, {"DROP", DROP}, {"ADD", ADD}, {"DISTINCT", DISTINCT}};
+
+const TypeMapping keyPhrases[] = {
+    {"EXISTS", EXISTS}, {"IN", IN}, {"ANY", ANY}, {"ALL", ALL}, {"EXCEPT", EXCEPT}, {"INTERSECT", INTERSECT}, {"LIKE", LIKE}, {"BETWEEN", BETWEEN}, {"DESC", DESC}};
+
+const TypeMapping operatorsList[] = {
+    {"EQUAL", EQUAL}, {"NOT_EQUAL", NOT_EQUAL}, {"LESS_THAN", LESS_THAN}, {"GREATER_THAN", GREATER_THAN}, {"LESS_THAN_OR_EQUAL", LESS_THAN_OR_EQUAL}, {"GREATER_THAN_OR_EQUAL", GREATER_THAN_OR_EQUAL}};
+
 lexer *createLexer(char *input)
 {
     lexer *Lexer = malloc(sizeof(lexer));
@@ -98,18 +107,18 @@ token getNextToken(lexer **Lexer)
 
         for (int k = 0; k < NUM_KEYWORDS; k++)
         {
-            if (strcmp(Token.lexeme, keyWords[k]) == 0)
+            if (strcmp(Token.lexeme, keyWords[k].str) == 0)
             {
-                Token.type = (tokenType)keyWords[k];
+                Token.type = keyWords[k].type;
                 break;
             }
         }
 
         for (int k = 0; k < NUM_KEYPHRASES; k++)
         {
-            if (strcmp(Token.lexeme, keyPhrases[k]) == 0)
+            if (strcmp(Token.lexeme, keyPhrases[k].str) == 0)
             {
-                Token.type = (tokenType)keyPhrases[k];
+                Token.type = keyPhrases[k].type;
                 break;
             }
         }
@@ -249,23 +258,4 @@ token getNextToken(lexer **Lexer)
     // Другие типы токенов могут быть добавлены сюда
 
     return Token;
-}
-
-int main()
-{
-    // Test Lexer
-    token *tokenList = malloc(sizeof(token) * 20);
-    char *input =
-        "DELETE FROM table_name\n"
-        "WHERE i < b;";
-    lexer *Lexer = createLexer(input);
-    int i = 0;
-    while (Lexer->position < strlen(Lexer->input))
-    {
-        tokenList[i] = getNextToken(&Lexer);
-        printf("%s - value\n", tokenList[i].lexeme);
-        i++;
-    }
-    int tokenLen = i;
-    destroyLexer(&Lexer);
 }
