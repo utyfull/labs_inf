@@ -183,6 +183,46 @@ ASTNode *parse(token *tokenList, int numTokens)
 
             currentTokenIndex++;
 
+            if (tokenList[currentTokenIndex].type == LEFT_PARENTHESIS)
+            {
+                ASTNode *columnsListNode = createASTNode(COLUMN_LIST, "COLUMN_LIST");
+
+                (currentTokenIndex)++;
+
+                while (currentTokenIndex < numTokens)
+                {
+
+                    if (tokenList[currentTokenIndex].type == RIGHT_PARENTHESIS)
+                    {
+
+                        break;
+                    }
+                    else if (tokenList[currentTokenIndex].type == COMMA)
+                    {
+
+                        currentTokenIndex++;
+                    }
+                    else
+                    {
+
+                        ASTNode *columnNode = createASTNode(tokenList[currentTokenIndex].type, tokenList[currentTokenIndex].lexeme);
+                        columnsListNode->children[columnsListNode->numChildren++] = columnNode;
+
+                        currentTokenIndex++;
+                    }
+                }
+
+                insertNode->children[insertNode->numChildren++] = columnsListNode;
+
+                if (tokenList[currentTokenIndex].type != RIGHT_PARENTHESIS)
+                {
+                    fprintf(stderr, "Ошибка: Ожидалась закрывающая скобка после списка значений\n");
+                    exit(EXIT_FAILURE);
+                }
+
+                currentTokenIndex++;
+            }
+
             if (tokenList[currentTokenIndex].type != VALUES)
             {
                 fprintf(stderr, "Ошибка: Ожидалось ключевое слово VALUES после имени таблицы\n");
@@ -422,7 +462,26 @@ ASTNode *parse(token *tokenList, int numTokens)
             ASTNode *orderBy = createASTNode(ORDERBY, "ORDERBY");
             currentTokenIndex++;
 
-            while (tokenList[currentTokenIndex].type != DESC)
+            while ((tokenList[currentTokenIndex].type != DESC || tokenList[currentTokenIndex].type != ASC) && currentTokenIndex < numTokens)
+            {
+                if (tokenList[currentTokenIndex].type == SEMICOLON)
+                {
+                    break;
+                }
+                else if (tokenList[currentTokenIndex].type == COMMA)
+                {
+                    currentTokenIndex++;
+                    continue;
+                }
+                else
+                {
+                    ASTNode *columnNode = createASTNode(COLUMN, tokenList[currentTokenIndex].lexeme);
+                    orderBy->children[orderBy->numChildren++] = columnNode;
+                    currentTokenIndex++;
+                }
+            }
+
+            root->children[root->numChildren++] = orderBy;
         }
         else
         {
@@ -430,9 +489,8 @@ ASTNode *parse(token *tokenList, int numTokens)
             fprintf(stderr, "ERROR: WRONG TOKEN: %s\n", currentToken.lexeme);
             exit(EXIT_FAILURE);
         }
-
-        return root;
     }
+    return root;
 }
 
 void printASTNode(ASTNode *node, int depth)
@@ -455,7 +513,7 @@ int main()
     // Test Lexer
     token *tokenList = malloc(sizeof(token) * 20);
     char *input =
-        "SELECT * FROM TableName WHERE a < b ORDERBY column1;";
+        "INSERT INTO tableName VALUES (value1, value2, value3);";
 
     lexer *Lexer = createLexer(input);
     int i = 0;

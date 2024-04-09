@@ -85,7 +85,8 @@ typedef enum
     EXCEPT = 74,
     INTERSECT = 75,
     DESC = 76,
-    ASC = 77
+    ASC = 77,
+    COLUMN_LIST = 78
 
 } tokenType;
 
