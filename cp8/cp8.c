@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 // Функция для создания нового узла
 Node *createNode(size_t data)
@@ -59,28 +60,42 @@ void clearList(Node **head)
     *head = NULL;  // Обнуляем указатель на голову списка
 }
 
+void insertAtIndex(Node **head, Node *value, int index)
+{
+    Node *temp = *head;
+    for (int i = 0; i < index - 1; i++)
+    {
+        temp = temp->next;
+    }
+    value->next = temp->next;
+    temp->next = value->next;
+}
+
 // Функция для перестановки первой и второй половины списка
 void swapHalves(Node **head)
 {
-    if (!*head || (*head)->next == *head)
-        return; // Если список пуст или содержит один элемент
-
-    Node *slow = *head, *fast = *head, *prev = NULL;
-    while (fast->next != *head && fast->next->next != *head)
+    int midIndex = floor(listLength(*head) / 2);
+    if (listLength(*head) % 2 == 0)
     {
-        prev = slow;
-        slow = slow->next;
-        fast = fast->next->next;
+        for (int i = 0; i < midIndex; i++)
+        {
+            *head = (*head)->next;
+        }
     }
-    if (fast->next->next == *head)
-    { // Для четного количества элементов
-        fast = fast->next;
+    else
+    {
+        Node *temp;
+        for (int i = 0; i < midIndex + 1; i++)
+        {
+            *head = (*head)->next;
+            if (i == midIndex + 1)
+            {
+                temp = deleteValue(head, (*head)->data);
+            }
+            swapHalves(head);
+            insertAtIndex(head, temp, midIndex + 1);
+        }
     }
-
-    Node *mid = slow;
-    fast->next = mid->next; // Начало второй половины становится началом списка
-    mid->next = *head;      // Конец первой половины указывает на начало списка
-    *head = fast->next;     // Обновляем голову списка
 }
 
 int listLength(Node *head)
@@ -111,40 +126,41 @@ void printList(Node *head)
     printf("\n");
 }
 
-Node *deleteValue(Node *head, size_t value)
+Node *deleteValue(Node **head, size_t value)
 {
-    Node *current = head;
+    Node *save;
+    Node *current = *head;
     Node *prev = NULL;
 
     while (current != NULL)
     {
         if (current->data == value)
         {
+            memcpy(save, current, sizeof(Node));
+            save->next = NULL;
             if (prev == NULL)
             {
-                if (current->next != head)
+                if (current->next != *head)
                 {
-                    head = current->next;
+                    *head = current->next;
                     Node *temp = current;
-                    while (temp->next != head)
+                    while (temp->next != *head)
                         temp = temp->next;
-                    temp->next = head;
+                    temp->next = *head;
                 }
                 else
                 {
-                    head = NULL;
+                    *head = NULL;
                 }
                 free(current);
-                return head;
             }
             prev->next = current->next;
             free(current);
-            return head;
         }
         prev = current;
         current = current->next;
     }
-    return head;
+    return save;
 }
 
 int main()
@@ -182,7 +198,7 @@ int main()
         if (strcmp(command, "deleteValue") == 0)
         {
             scanf("%zu", &unsignedValue);
-            head = deleteValue(head, unsignedValue);
+            deleteValue(&head, unsignedValue);
             continue;
         }
         if (strcmp(command, "exit") == 0)

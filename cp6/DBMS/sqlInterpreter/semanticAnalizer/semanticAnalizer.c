@@ -22,11 +22,11 @@ ASTNode *createASTNode(tokenType type, const char *lexeme)
 
 void freeAST(ASTNode **root)
 {
-    if (root == NULL)
+    if (*root == NULL)
         return;
     for (int i = 0; i < (*root)->numChildren; i++)
         freeAST(&(*root)->children[i]);
-    free(root);
+    free(*root);
 }
 
 ASTNode *parse(token *tokenList, int numTokens)
@@ -321,7 +321,7 @@ ASTNode *parse(token *tokenList, int numTokens)
 
                     currentTokenIndex++;
 
-                    if (tokenList[currentTokenIndex].type != STRING || tokenList[currentTokenIndex].type != NUMBER)
+                    if (tokenList[currentTokenIndex].type != STRING && tokenList[currentTokenIndex].type != NUMBER)
                     {
                         fprintf(stderr, "Ошибка: Ожидалось значение после оператора присваивания\n");
                         exit(EXIT_FAILURE);
@@ -330,15 +330,15 @@ ASTNode *parse(token *tokenList, int numTokens)
                     ASTNode *valueNode = createASTNode(tokenList[currentTokenIndex].type, tokenList[currentTokenIndex].lexeme);
                     setNode->children[setNode->numChildren++] = valueNode;
                 }
-                else if (tokenList[currentTokenIndex + 1].type == WHERE)
+                else if (tokenList[currentTokenIndex].type == WHERE)
                 {
-
+                    currentTokenIndex--;
                     break;
                 }
-                else if (tokenList[currentTokenIndex + 1].type == COMMA)
+                else if (tokenList[currentTokenIndex].type == COMMA)
                 {
 
-                    (currentTokenIndex) += 2;
+                    (currentTokenIndex)++;
                 }
                 else
                 {
@@ -349,7 +349,7 @@ ASTNode *parse(token *tokenList, int numTokens)
                 currentTokenIndex++;
             }
             updateNode->children[updateNode->numChildren++] = setNode;
-
+            root->children[root->numChildren++] = updateNode;
             currentTokenIndex++;
             continue;
         }
@@ -446,7 +446,7 @@ ASTNode *parse(token *tokenList, int numTokens)
                 }
             }
 
-            createObject->children[createObject->numChildren++] = valuesListNode;
+            createObjectBig->children[createObjectBig->numChildren++] = valuesListNode;
             createObjectBig->children[createObjectBig->numChildren++] = createObject;
             createNode->children[createNode->numChildren++] = createObjectBig;
             if (tokenList[currentTokenIndex].type != RIGHT_PARENTHESIS)
@@ -513,7 +513,7 @@ int main()
     // Test Lexer
     token *tokenList = malloc(sizeof(token) * 20);
     char *input =
-        "INSERT INTO tableName VALUES (value1, value2, value3);";
+        "SELECT name FROM users WHERE age > 30 AND city == 'New York';";
 
     lexer *Lexer = createLexer(input);
     int i = 0;
@@ -529,4 +529,5 @@ int main()
     ASTNode *root = parse(tokenList, tokenLen);
     printASTNode(root, 0);
     destroyLexer(&Lexer);
+    freeAST(&root);
 }

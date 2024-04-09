@@ -13,7 +13,7 @@ const TypeMapping keyPhrases[] = {
     {"EXISTS", EXISTS}, {"IN", IN}, {"ANY", ANY}, {"ALL", ALL}, {"EXCEPT", EXCEPT}, {"INTERSECT", INTERSECT}, {"LIKE", LIKE}, {"BETWEEN", BETWEEN}, {"DESC", DESC}, {"ASC", ASC}};
 
 const TypeMapping operatorsList[] = {
-    {"EQUAL", EQUAL}, {"NOT_EQUAL", NOT_EQUAL}, {"LESS_THAN", LESS_THAN}, {"GREATER_THAN", GREATER_THAN}, {"LESS_THAN_OR_EQUAL", LESS_THAN_OR_EQUAL}, {"GREATER_THAN_OR_EQUAL", GREATER_THAN_OR_EQUAL}};
+    {"EQUAL", EQUAL_TO}, {"NOT_EQUAL", NOT_EQUAL}, {"LESS_THAN", LESS_THAN}, {"GREATER_THAN", GREATER_THAN}, {"LESS_THAN_OR_EQUAL", LESS_THAN_OR_EQUAL}, {"GREATER_THAN_OR_EQUAL", GREATER_THAN_OR_EQUAL}};
 
 lexer *createLexer(char *input)
 {
@@ -182,7 +182,6 @@ token getNextToken(lexer **Lexer)
         Token.type = STRING;
         int i = 0;
         char quoteChar = currentChar;
-        Token.lexeme[i++] = currentChar;
         (*Lexer)->position++;
         currentChar = (*Lexer)->input[(*Lexer)->position];
         while (currentChar != '\0' && currentChar != quoteChar)
@@ -193,8 +192,12 @@ token getNextToken(lexer **Lexer)
         }
         if (currentChar == quoteChar)
         {
-            Token.lexeme[i++] = currentChar;
             (*Lexer)->position++;
+        }
+        else
+        {
+            fprintf(stderr, "NEED QUOTE");
+            exit(EXIT_FAILURE);
         }
         Token.lexeme[i] = '\0';
     }

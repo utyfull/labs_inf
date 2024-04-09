@@ -15,6 +15,7 @@ void swapHalves(Node **head);
 void printList(Node *head);
 int listLength(Node *head);
 void clearList(Node **head);
-Node *deleteValue(Node *head, size_t value);
+Node *deleteValue(Node **head, size_t value);
+void insertAtIndex(Node **head, Node *value, int index);
 
 #endif
