@@ -507,27 +507,3 @@ void printASTNode(ASTNode *node, int depth)
         printASTNode(node->children[i], depth + 1);
     }
 }
-
-int main()
-{
-    // Test Lexer
-    token *tokenList = malloc(sizeof(token) * 20);
-    char *input =
-        "SELECT name FROM users WHERE age > 30 AND city == 'New York';";
-
-    lexer *Lexer = createLexer(input);
-    int i = 0;
-    while (Lexer->position < strlen(Lexer->input))
-    {
-        tokenList[i] = getNextToken(&Lexer);
-        printf("%s - value, %d - type\n", tokenList[i].lexeme, tokenList[i].type);
-        i++;
-    }
-    printf("-----------------------\n");
-    int tokenLen = i;
-    // Test parser
-    ASTNode *root = parse(tokenList, tokenLen);
-    printASTNode(root, 0);
-    destroyLexer(&Lexer);
-    freeAST(&root);
-}

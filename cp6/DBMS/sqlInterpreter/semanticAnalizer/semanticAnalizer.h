@@ -3,9 +3,12 @@
 
 #include "../sintaxAnalizer/sintaxAnalizer.h"
 
+#define NUM_KEYPRIORITY 19
+
 typedef struct
 {
-    ASTNode *queue[10];
+    ASTNode *queue[20];
+    int queueSize;
 } nodeQueue;
 
 typedef struct
@@ -14,7 +17,13 @@ typedef struct
     int priority;
 } keyWordPriority;
 
-void makeQueue(ASTNode *root);
-void checkSemantic(nodeQueue NodeQueue);
+extern const keyWordPriority keyPriority[];
+
+void deleteQueue(nodeQueue **Queue);
+void printQueue(nodeQueue *nodeQueue);
+void recursivSearch(ASTNode *node, nodeQueue **Queue);
+ASTNode *checkPriority(ASTNode *node);
+nodeQueue *makeQueue(ASTNode *root);
+void checkSemantic(nodeQueue *nodeQueue);
 
 #endif
