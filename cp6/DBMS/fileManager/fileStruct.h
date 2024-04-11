@@ -1,5 +1,5 @@
 
-#include "tableStruct.h"
+#include "../DbEngine/tableStruct.h"
 
-void writeTableToFile(const char* filename, table *t);
-void readTableFromFile(const char* filename, table **t);
+void writeTableToFile(const char *filename, table *t);
+void readTableFromFile(const char *filename, table **t);
