@@ -12,6 +12,7 @@ typedef struct ASTNode
     ASTNode *children[20];
     int numChildren;
     int priority;
+    int position;
 } ASTNode;
 
 ASTNode *createASTNode(tokenType type, const char *lexeme);

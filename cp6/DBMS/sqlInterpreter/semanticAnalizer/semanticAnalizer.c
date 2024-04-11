@@ -33,6 +33,7 @@ void printQueue(nodeQueue *nodeQueue)
     {
         printASTNode(nodeQueue->queue[i], 0);
         printf("%d - priority\n", nodeQueue->queue[i]->priority);
+        printf("%d - position\n", nodeQueue->queue[i]->position);
     }
 }
 
@@ -91,6 +92,10 @@ nodeQueue *makeQueue(ASTNode *root)
     currentQueue->queueSize = 0;
 
     recursivSearch(root, &currentQueue);
+    for (int i = 0; i < currentQueue->queueSize; i++)
+    {
+        currentQueue->queue[i]->position = i;
+    }
     return currentQueue;
 }
 
