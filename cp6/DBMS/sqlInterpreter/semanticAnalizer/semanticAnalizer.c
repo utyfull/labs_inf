@@ -23,9 +23,10 @@ const keyWordPriority keyPriority[] = {
     {ORDERBY, 15},
     {LIMIT, 16},
     {INTO, 17},
-    {VALUES, 18},
-    {VALUES_LIST, 19},
-    {SET, 20}};
+    {COLUMN_LIST, 18},
+    {VALUES, 19},
+    {VALUES_LIST, 20},
+    {SET, 21}};
 
 void printQueue(nodeQueue *nodeQueue)
 {
@@ -65,7 +66,7 @@ ASTNode *checkPriority(ASTNode *node)
     }
     if (temp->numChildren != 0)
     {
-        fprintf(stderr, "ERROR: WRONG KEYWORD");
+        fprintf(stderr, "ERROR: WRONG KEYWORD %d", temp->type);
         exit(EXIT_FAILURE);
     }
     else

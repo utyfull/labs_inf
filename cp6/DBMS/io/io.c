@@ -23,6 +23,7 @@ int main()
                 FILE *file = fopen(filePath, "r");
                 if (file != NULL)
                 {
+                    table *Table = NULL;
                     // Do something with the opened file, e.g., read content
                     char c = fgetc(file);
                     while (c != EOF)
@@ -41,6 +42,10 @@ int main()
                         free(buffer);
                         buffer = NULL;
                         c = fgetc(file);
+                    }
+                    if (Table != NULL)
+                    {
+                        writeTableToFile("WTF.db", Table);
                     }
                     fclose(file);
                 }

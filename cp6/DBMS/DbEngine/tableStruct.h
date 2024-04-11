@@ -15,7 +15,7 @@ typedef struct
 } table;
 
 table *createTable(char *tableName, int id);
-void insertColumn(char *columnName, table **Table);
+void insertColumn(char *columnName, table **Table, type Type);
 void freeTable(table **tbl);
 void deleteColumn(table *Table, int ind);
 void insertValue(table **Table, int ind, char *value);

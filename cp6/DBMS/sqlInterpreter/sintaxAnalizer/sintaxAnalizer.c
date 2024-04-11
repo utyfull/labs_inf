@@ -429,15 +429,15 @@ ASTNode *parse(token *tokenList, int numTokens)
 
                     if (strcmp(tokenList[currentTokenIndex].lexeme, "INT") == 0)
                     {
-                        tokenList[currentTokenIndex].type = INT;
+                        tokenList[currentTokenIndex].type = INT_T;
                     }
                     else if (strcmp(tokenList[currentTokenIndex].lexeme, "CHAR") == 0)
                     {
-                        tokenList[currentTokenIndex].type = CHAR;
+                        tokenList[currentTokenIndex].type = CHAR_T;
                     }
                     else if (strcmp(tokenList[currentTokenIndex].lexeme, "FLOAT") == 0)
                     {
-                        tokenList[currentTokenIndex].type = FLOAT;
+                        tokenList[currentTokenIndex].type = FLOAT_T;
                     }
                     ASTNode *valueNode = createASTNode(tokenList[currentTokenIndex].type, tokenList[currentTokenIndex].lexeme);
                     valuesListNode->children[valuesListNode->numChildren++] = valueNode;

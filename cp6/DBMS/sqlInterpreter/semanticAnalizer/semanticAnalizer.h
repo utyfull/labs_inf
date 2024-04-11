@@ -3,7 +3,7 @@
 
 #include "../sintaxAnalizer/sintaxAnalizer.h"
 
-#define NUM_KEYPRIORITY 19
+#define NUM_KEYPRIORITY 20
 
 typedef struct
 {

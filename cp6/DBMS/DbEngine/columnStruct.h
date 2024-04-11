@@ -1,18 +1,22 @@
 #ifndef _COLUMN_STRUCT_H_
 #define _COLUMN_STRUCT_H_
 
-typedef enum {
+typedef enum
+{
     INTEGER = 0,
     CHAR = 2,
     FLOAT = 1
 } type;
 
-typedef struct{
+typedef struct
+{
     type type;
-    void* data;
+    void *data;
 } cell;
 
-typedef struct column{
+typedef struct column
+{
+    type type;
     char columnName[50];
     cell **Cells;
     int size;
@@ -20,12 +24,12 @@ typedef struct column{
 } column;
 
 int typeCheck(char *value);
-cell* createCell(char *value);
+cell *createCell(char *value);
 void insertCell(cell *Cell, column *Column);
-column* createColumn(char* columnName, int id);
+column *createColumn(char *columnName, int id, type Type);
 void freeColumn(column **Column);
-void deleteCell(column* Column, int ind);
-void printColumn(column* Column);
+void deleteCell(column *Column, int ind);
+void printColumn(column *Column);
 void freeCell(cell **Cell);
 
 #endif

@@ -75,9 +75,9 @@ typedef enum
     QUERY = 64,                 // start AST
     COLUMN = 65,                // Column
     TABLE = 66,                 // Table
-    CHAR = 67,                  // Data type char
-    INT = 68,                   // Data type INT
-    FLOAT = 69,                 // DATA type float
+    CHAR_T = 67,                // Data type char
+    INT_T = 68,                 // Data type INT
+    FLOAT_T = 69,               // DATA type float
     LIMIT = 70,
     HAVING = 71,
     EXISTS = 72,
