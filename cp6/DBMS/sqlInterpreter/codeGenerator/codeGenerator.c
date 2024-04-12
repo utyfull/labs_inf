@@ -199,6 +199,205 @@ void generate(nodeQueue *Queue, table **TAble)
                     printColumn(Table->columns[Columns.id[i]]);
                 }
             }
+            else
+            {
+                if (Queue->queue[pos]->type != WHERE)
+                {
+                    fprintf(stderr, "NEED WHERE AFTER FROM");
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+        else if (Queue->queue[pos]->type == WHERE)
+        {
+            if (Queue->queue[pos]->numChildren % 3 != 0 || Queue->queue[pos]->numChildren % 4 != 0)
+            {
+                fprintf(stderr, "TOO SMALL ARGIMENTS FOR WHERE");
+                exit(EXIT_FAILURE);
+            }
+            for (int i = 0; i < Queue->queue[pos]->numChildren; i++)
+            {
+                if (i % 3 == 0)
+                {
+                    for (int j = 0; j < Table->size; j++)
+                    {
+                    }
+                }
+            }
         }
     }
+}
+
+stringInd *makeSearchC(stringInd *list, column *column1, column *column2, tokenType operator)
+{
+    stringInd *temp = malloc(sizeof(stringInd));
+
+    if (column1->type != column2->type)
+    {
+        fprintf(stderr, "WRONG TYPES");
+        exit(EXIT_FAILURE);
+    }
+
+    if (operator== EQUAL_TO)
+    {
+        for (int i = 0; i < column1->size; i++)
+        {
+            if (column1->Cells[i]->data == column2->Cells[i]->data)
+            {
+                if (list != NULL)
+                {
+                    for (int j = 0; j < list->size; j++)
+                    {
+                        if (list->ind[j] == i)
+                        {
+                            temp->ind[temp->size++] = i;
+                        }
+                    }
+                }
+                else
+                {
+                    temp->ind[temp->size++] = i;
+                }
+            }
+        }
+    }
+    else if (operator== GREATER_THAN)
+    {
+        for (int i = 0; i < column1->size; i++)
+        {
+            if (*(float *)column1->Cells[i]->data > *(float *)column2->Cells[i]->data)
+            {
+                if (list != NULL)
+                {
+                    for (int j = 0; j < list->size; j++)
+                    {
+                        if (list->ind[j] == i)
+                        {
+                            temp->ind[temp->size++] = i;
+                        }
+                    }
+                }
+                else
+                {
+                    temp->ind[temp->size++] = i;
+                }
+            }
+        }
+    }
+    else if (operator== LESS_THAN)
+    {
+        for (int i = 0; i < column1->size; i++)
+        {
+            if (*(float *)column1->Cells[i]->data < *(float *)column2->Cells[i]->data)
+            {
+                if (list != NULL)
+                {
+                    for (int j = 0; j < list->size; j++)
+                    {
+                        if (list->ind[j] == i)
+                        {
+                            temp->ind[temp->size++] = i;
+                        }
+                    }
+                }
+                else
+                {
+                    temp->ind[temp->size++] = i;
+                }
+            }
+        }
+    }
+    else
+    {
+        fprintf(stderr, "WRONG OPERATOR");
+        exit(EXIT_FAILURE);
+    }
+    return temp;
+}
+
+stringInd *makeSearchV(stringInd *list, column *column1, void *value, tokenType operator)
+{
+    stringInd *temp = malloc(sizeof(stringInd));
+
+    // if (column1->type != column2->type)
+    // {
+    //     fprintf(stderr, "WRONG TYPES");
+    //     exit(EXIT_FAILURE);
+    // }
+
+    if (operator== EQUAL_TO)
+    {
+        for (int i = 0; i < column1->size; i++)
+        {
+            if (*(float *)column1->Cells[i]->data == *(float *)value)
+            {
+                if (list != NULL)
+                {
+                    for (int j = 0; j < list->size; j++)
+                    {
+                        if (list->ind[j] == i)
+                        {
+                            temp->ind[temp->size++] = i;
+                        }
+                    }
+                }
+                else
+                {
+                    temp->ind[temp->size++] = i;
+                }
+            }
+        }
+    }
+    else if (operator== GREATER_THAN)
+    {
+        for (int i = 0; i < column1->size; i++)
+        {
+            if (*(float *)column1->Cells[i]->data > *(float *)value)
+            {
+                if (list != NULL)
+                {
+                    for (int j = 0; j < list->size; j++)
+                    {
+                        if (list->ind[j] == i)
+                        {
+                            temp->ind[temp->size++] = i;
+                        }
+                    }
+                }
+                else
+                {
+                    temp->ind[temp->size++] = i;
+                }
+            }
+        }
+    }
+    else if (operator== LESS_THAN)
+    {
+        for (int i = 0; i < column1->size; i++)
+        {
+            if (*(float *)column1->Cells[i]->data < *(float *)value)
+            {
+                if (list != NULL)
+                {
+                    for (int j = 0; j < list->size; j++)
+                    {
+                        if (list->ind[j] == i)
+                        {
+                            temp->ind[temp->size++] = i;
+                        }
+                    }
+                }
+                else
+                {
+                    temp->ind[temp->size++] = i;
+                }
+            }
+        }
+    }
+    else
+    {
+        fprintf(stderr, "WRONG OPERATOR");
+        exit(EXIT_FAILURE);
+    }
+    return temp;
 }
