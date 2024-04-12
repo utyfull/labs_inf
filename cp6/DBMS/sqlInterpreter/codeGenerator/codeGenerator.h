@@ -13,6 +13,12 @@ typedef struct
     type type;
 } typeRelation;
 
+typedef struct
+{
+    int id[20];
+    int size;
+} columnList;
+
 extern typeRelation types[];
 
 void generate(nodeQueue *Queue, table **TAble);

@@ -21,7 +21,7 @@ int main()
     // Test sematic analizer
     token *tokenList = malloc(sizeof(token) * 20);
     char *input =
-        "SELECT * FROM table;";
+        "SELECT PlanetName, openingYear FROM table_name WHERE PlanetName < 5 AND PlanetName > 4;";
     lexer *Lexer = createLexer(input);
     int i = 0;
     while (Lexer->position < strlen(Lexer->input))
@@ -46,8 +46,8 @@ int main()
 void generate(nodeQueue *Queue, table **TAble)
 {
     table *Table = (*TAble);
-    column *Column = NULL;
     int pos = 0;
+    columnList Columns;
 
     qsort((void *)Queue, Queue->queueSize, sizeof(*Queue), comparator);
 
@@ -125,6 +125,7 @@ void generate(nodeQueue *Queue, table **TAble)
                             {
                                 if (strcmp(Table->columns[i]->columnName, Queue->queue[pos]->children[j]->lexeme) == 0)
                                 {
+
                                     insertValue(&Table, i, Queue->queue[pos + 1]->children[j]->lexeme);
                                 }
                             }
@@ -146,6 +147,7 @@ void generate(nodeQueue *Queue, table **TAble)
                             insertValue(&Table, i, Queue->queue[pos]->children[i]->lexeme);
                         }
                     }
+                    pos++;
                 }
             }
             if (pos != Queue->queueSize)
@@ -154,8 +156,49 @@ void generate(nodeQueue *Queue, table **TAble)
                 exit(EXIT_FAILURE);
             }
         }
-        // else if ()
+        else if (Queue->queue[pos]->type == FROM)
         {
+            readTableFromFile("WTF.db", &Table);
+            pos++;
+        }
+        else if (Queue->queue[pos]->type == SELECT)
+        {
+            if (Table == NULL)
+            {
+                fprintf(stderr, "NEED TABLE FOR SELECT");
+            }
+            else
+            {
+                if (Queue->queue[pos]->children[0]->type == ALL)
+                {
+                    for (int i = 0; i < Table->size; i++)
+                    {
+                        Columns.id[Columns.size++] = i;
+                    }
+                    pos++;
+                }
+                else
+                {
+                    for (int i = 0; i < Table->size; i++)
+                    {
+                        for (int j = 0; j < Queue->queue[pos]->numChildren; j++)
+                        {
+                            if (strcmp(Table->columns[i]->columnName, Queue->queue[pos]->children[j]->lexeme) == 0)
+                            {
+                                Columns.id[Columns.size] = i;
+                            }
+                        }
+                    }
+                    pos++;
+                }
+            }
+            if (pos == Queue->queueSize)
+            {
+                for (int i = 0; i < Columns.size; i++)
+                {
+                    printColumn(Table->columns[Columns.id[i]]);
+                }
+            }
         }
     }
 }
