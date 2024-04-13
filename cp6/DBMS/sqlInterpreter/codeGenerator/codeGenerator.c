@@ -210,19 +210,26 @@ void generate(nodeQueue *Queue, table **TAble)
         }
         else if (Queue->queue[pos]->type == WHERE)
         {
+            int max = 0;
+            stringInd *list = NULL;
             if (Queue->queue[pos]->numChildren % 3 != 0 || Queue->queue[pos]->numChildren % 4 != 0)
             {
                 fprintf(stderr, "TOO SMALL ARGIMENTS FOR WHERE");
                 exit(EXIT_FAILURE);
             }
-            for (int i = 0; i < Queue->queue[pos]->numChildren; i++)
-            {
-                if (i % 3 == 0)
+            if (Queue->queue[pos]->numChildren)
+
+                while (max < Queue->queue[pos]->numChildren)
                 {
-                    for (int j = 0; j < Table->size; j++)
+
+                    if (Queue->queue[pos]->children[max]->type == AND)
                     {
                     }
                 }
+            if (pos != Queue->queueSize)
+            {
+                fprintf(stderr, "NEED NOTHING AFTER WHERE");
+                exit(EXIT_FAILURE);
             }
         }
     }

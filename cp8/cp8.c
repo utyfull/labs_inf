@@ -68,7 +68,7 @@ void insertAtIndex(Node **head, Node *value, int index)
         temp = temp->next;
     }
     value->next = temp->next;
-    temp->next = value->next;
+    temp->next = value;
 }
 
 // Функция для перестановки первой и второй половины списка
@@ -84,17 +84,18 @@ void swapHalves(Node **head)
     }
     else
     {
-        Node *temp;
-        for (int i = 0; i < midIndex + 1; i++)
+        Node *temp = *head;
+        Node *loh;
+        for (int i = 0; i < midIndex; i++)
         {
-            *head = (*head)->next;
-            if (i == midIndex + 1)
+            temp = temp->next;
+            if (i == midIndex - 1)
             {
-                temp = deleteValue(head, (*head)->data);
+                loh = deleteValue(head, temp->data);
             }
-            swapHalves(head);
-            insertAtIndex(head, temp, midIndex + 1);
         }
+        swapHalves(head);
+        insertAtIndex(head, loh, midIndex);
     }
 }
 
@@ -128,7 +129,7 @@ void printList(Node *head)
 
 Node *deleteValue(Node **head, size_t value)
 {
-    Node *save;
+    Node *save = NULL;
     Node *current = *head;
     Node *prev = NULL;
 
@@ -136,8 +137,13 @@ Node *deleteValue(Node **head, size_t value)
     {
         if (current->data == value)
         {
-            memcpy(save, current, sizeof(Node));
-            save->next = NULL;
+            Node *temp = current;
+            if (save == NULL)
+            {
+                save = (Node *)malloc(sizeof(Node));
+                save->data = current->data;
+                save->next = NULL;
+            }
             if (prev == NULL)
             {
                 if (current->next != *head)
@@ -152,13 +158,22 @@ Node *deleteValue(Node **head, size_t value)
                 {
                     *head = NULL;
                 }
-                free(current);
+                current = current->next;
+                free(temp);
             }
-            prev->next = current->next;
-            free(current);
+            else
+            {
+                prev->next = current->next;
+                current = current->next;
+                free(temp);
+                break;
+            }
         }
-        prev = current;
-        current = current->next;
+        else
+        {
+            prev = current;
+            current = current->next;
+        }
     }
     return save;
 }
