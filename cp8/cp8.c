@@ -137,42 +137,50 @@ Node *deleteValue(Node **head, size_t value)
     {
         if (current->data == value)
         {
-            Node *temp = current;
-            if (save == NULL)
+
+            save = (Node *)malloc(sizeof(Node));
+            save->data = current->data;
+            save->next = NULL;
+
+            if (current == *head)
             {
-                save = (Node *)malloc(sizeof(Node));
-                save->data = current->data;
-                save->next = NULL;
-            }
-            if (prev == NULL)
-            {
+
                 if (current->next != *head)
                 {
+                    Node *last = current;
+                    while (last->next != *head)
+                        last = last->next;
                     *head = current->next;
-                    Node *temp = current;
-                    while (temp->next != *head)
-                        temp = temp->next;
-                    temp->next = *head;
+                    last->next = *head;
                 }
                 else
                 {
                     *head = NULL;
                 }
-                current = current->next;
-                free(temp);
+
+                if (current->next == current) // If there is only one node in the list
+                    *head = NULL;
             }
             else
             {
+
                 prev->next = current->next;
-                current = current->next;
-                free(temp);
-                break;
             }
+
+            if (current == *head)
+                *head = current->next;
+
+            Node *toFree = current;
+            current = current->next;
+            free(toFree);
+            break;
         }
         else
         {
             prev = current;
             current = current->next;
+            if (current == *head)
+                break;
         }
     }
     return save;
@@ -212,8 +220,10 @@ int main()
         }
         if (strcmp(command, "deleteValue") == 0)
         {
+            Node *bespolezn;
             scanf("%zu", &unsignedValue);
-            deleteValue(&head, unsignedValue);
+            bespolezn = deleteValue(&head, unsignedValue);
+            free(bespolezn);
             continue;
         }
         if (strcmp(command, "exit") == 0)

@@ -12,7 +12,7 @@ int comparator(const void *p, const void *q)
     return (((ASTNode *)(p))->priority - ((ASTNode *)(q))->priority);
 }
 
-int main()
+void prepareGenerate(char *input, table **Table)
 {
     // Test Lexer
     //-------------
@@ -20,8 +20,6 @@ int main()
     //-------------
     // Test sematic analizer
     token *tokenList = malloc(sizeof(token) * 20);
-    char *input =
-        "SELECT PlanetName, openingYear FROM table_name WHERE PlanetName < 5 AND PlanetName > 4;";
     lexer *Lexer = createLexer(input);
     int i = 0;
     while (Lexer->position < strlen(Lexer->input))
@@ -38,9 +36,22 @@ int main()
     printf("---------------------------\n");
     nodeQueue *queue = makeQueue(root);
     printQueue(queue);
+    generate(queue, Table);
     destroyLexer(&Lexer);
     freeAST(&root);
     free(queue);
+}
+
+column *searchColumnInd(table *Table, char *columnName)
+{
+    for (int i = 0; i < Table->size; i++)
+    {
+        if (strcmp(Table->columns[i]->columnName, columnName) == 0)
+        {
+            return Table->columns[i];
+        }
+    }
+    return Table->columns[0];
 }
 
 void generate(nodeQueue *Queue, table **TAble)
@@ -217,15 +228,37 @@ void generate(nodeQueue *Queue, table **TAble)
                 fprintf(stderr, "TOO SMALL ARGIMENTS FOR WHERE");
                 exit(EXIT_FAILURE);
             }
-            if (Queue->queue[pos]->numChildren)
+            if (Queue->queue[pos]->numChildren == 3)
+            {
+                if (Queue->queue[pos]->children[2]->type != IDENTIFIER)
+                {
+                    list = makeSearchV(list, searchColumnInd(Table, Queue->queue[pos]->children[0]->lexeme), Queue->queue[pos]->children[2]->lexeme, Queue->queue[pos]->children[1]->type);
+                }
+                else
+                {
+                    list = makeSearchV(list, searchColumnInd(Table, Queue->queue[pos]->children[0]->lexeme), searchColumnInd(Table, Queue->queue[pos]->children[2]->lexeme), Queue->queue[pos]->children[1]->type);
+                }
+            }
+            else
+            {
 
                 while (max < Queue->queue[pos]->numChildren)
                 {
 
                     if (Queue->queue[pos]->children[max]->type == AND)
                     {
+                        if (Queue->queue[pos]->children[max - 1]->type != IDENTIFIER)
+                        {
+                            list = makeSearchV(list, searchColumnInd(Table, Queue->queue[pos]->children[max - 3]->lexeme), searchColumnInd(Table, Queue->queue[pos]->children[max - 1]->lexeme), Queue->queue[pos]->children[max - 2]->type);
+                        }
+                        else
+                        {
+                            list = makeSearchC(list, searchColumnInd(Table, Queue->queue[pos]->children[max - 3]->lexeme), searchColumnInd(Table, Queue->queue[pos]->children[max - 1]->lexeme), Queue->queue[pos]->children[max - 2]->type);
+                        }
                     }
+                    max++;
                 }
+            }
             if (pos != Queue->queueSize)
             {
                 fprintf(stderr, "NEED NOTHING AFTER WHERE");

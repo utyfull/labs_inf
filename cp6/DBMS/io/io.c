@@ -38,7 +38,7 @@ int main()
                         buffer[index++] = c;
                         buffer[index++] = '\0';
                         // do
-
+                        prepareGenerate(buffer, &Table);
                         free(buffer);
                         buffer = NULL;
                         c = fgetc(file);
