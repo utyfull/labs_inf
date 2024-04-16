@@ -34,7 +34,7 @@ token getNextToken(lexer **Lexer)
     char currentChar = (*Lexer)->input[(*Lexer)->position];
 
     // Пропустить пробелы и символы новой строки
-    while (currentChar == ' ' || currentChar == '\n')
+    while (currentChar == ' ' || currentChar == '\n' || currentChar == '\t')
     {
         (*Lexer)->position++;
         currentChar = (*Lexer)->input[(*Lexer)->position];

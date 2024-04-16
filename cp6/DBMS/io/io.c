@@ -20,7 +20,7 @@ int main()
             {
                 char filePath[1024];
                 snprintf(filePath, sizeof(filePath), "%s/%s", "/home/utyfull/Desktop/labs/labs_inf/cp6", ent->d_name);
-                FILE *file = fopen(filePath, "r");
+                FILE *file = fopen(filePath, "rt");
                 if (file != NULL)
                 {
                     table *Table = NULL;
@@ -37,11 +37,14 @@ int main()
                         }
                         buffer[index++] = c;
                         buffer[index++] = '\0';
+                        c = fgetc(file);
+                        if (c == EOF)
+                            break;
                         // do
+                        printf("%s\n\n", buffer);
                         prepareGenerate(buffer, &Table);
                         free(buffer);
                         buffer = NULL;
-                        c = fgetc(file);
                     }
                     if (Table != NULL)
                     {

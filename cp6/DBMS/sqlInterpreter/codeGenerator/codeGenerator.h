@@ -28,7 +28,7 @@ typedef struct
 
 extern typeRelation types[];
 
-void generate(nodeQueue *Queue, table **TAble);
+void generate(nodeQueue *Queue, table **Table);
 void queueString(char *String);
 void prepareGenerate(char *input, table **Table);
 column *searchColumnInd(table *Table, char *columnName);

@@ -7,9 +7,20 @@
 
 typeRelation types[] = {{INT_T, INTEGER}, {CHAR_T, CHAR}, {FLOAT_T, FLOAT}};
 
-int comparator(const void *p, const void *q)
+int compar(const void *p, const void *q)
 {
-    return (((ASTNode *)(p))->priority - ((ASTNode *)(q))->priority);
+    if (((ASTNode *)(p))->priority < ((ASTNode *)(q))->priority)
+    {
+        return -1;
+    }
+    else if (((ASTNode *)(p))->priority > ((ASTNode *)(q))->priority)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 void prepareGenerate(char *input, table **Table)
@@ -54,13 +65,20 @@ column *searchColumnInd(table *Table, char *columnName)
     return Table->columns[0];
 }
 
-void generate(nodeQueue *Queue, table **TAble)
+void generate(nodeQueue *Queue, table **Table)
 {
-    table *Table = (*TAble);
     int pos = 0;
-    columnList Columns;
 
-    qsort((void *)Queue, Queue->queueSize, sizeof(*Queue), comparator);
+    qsort(Queue, Queue->queueSize, sizeof(ASTNode *), compar);
+    if (Queue->queueSize == 0)
+    {
+        return;
+    }
+
+    // printf("%s\n", Queue->queue[0]->lexeme);
+    // printf("%s\n", Queue->queue[1]->lexeme);
+    // printf("%d\n", Queue->queue[0]->priority);
+    // printf("%d\n", Queue->queue[1]->priority);
 
     while (pos <= Queue->queueSize)
     {
@@ -68,7 +86,7 @@ void generate(nodeQueue *Queue, table **TAble)
         {
             if (Queue->queue[pos]->position != 0)
             {
-                fprintf(stderr, "CREATE MUST BE IN 0 POSITION");
+                fprintf(stderr, "CREATE MUST BE IN 0 POSITION\n");
                 exit(EXIT_FAILURE);
             }
             else
@@ -76,35 +94,39 @@ void generate(nodeQueue *Queue, table **TAble)
                 pos++;
                 if (Queue->queue[pos]->type == TABLE_DDL)
                 {
-                    Table = createTable(Queue->queue[pos]->children[0]->lexeme, 0);
+                    *Table = createTable(Queue->queue[pos]->children[0]->lexeme, 0);
                     pos++;
 
                     if (Queue->queue[pos]->type == VALUES_LIST)
                     {
                         if (Queue->queue[pos]->numChildren % 2 != 0)
                         {
-                            fprintf(stderr, "TOO SMALL ARGUMENTS");
+                            fprintf(stderr, "TOO SMALL ARGUMENTS\n");
                             exit(EXIT_FAILURE);
                         }
-                        for (int i = 0; i < Queue->queue[pos]->numChildren; i++)
+                        for (int i = 0; i < Queue->queue[pos]->numChildren; i += 2)
                         {
-                            for (int i = 0; i < NUM_TYPES; i++)
+                            for (int j = 0; j < NUM_TYPES; j++)
                             {
-                                if (Queue->queue[pos]->children[i + 1]->type == types[i].token)
-                                    insertColumn(Queue->queue[pos]->children[i]->lexeme, &Table, types[i].type);
-                                pos += 2;
+                                if (Queue->queue[pos]->children[i + 1]->type == types[j].token)
+                                    insertColumn(Queue->queue[pos]->children[i]->lexeme, Table, types[j].type);
                             }
                         }
+                        pos++;
                     }
                     if (pos != Queue->queueSize)
                     {
-                        fprintf(stderr, "TOO MANY ARGUMENTS FOR CREATE");
+                        fprintf(stderr, "TOO MANY ARGUMENTS FOR CREATE\n");
                         exit(EXIT_FAILURE);
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
                 else
                 {
-                    fprintf(stderr, "POKA NET DRUGIH TIPOV DLYA CREATE");
+                    fprintf(stderr, "POKA NET DRUGIH TIPOV DLYA CREATE\n");
                     exit(EXIT_FAILURE);
                 }
             }
@@ -113,31 +135,31 @@ void generate(nodeQueue *Queue, table **TAble)
         {
             if (Queue->queue[pos]->position != 0)
             {
-                fprintf(stderr, "INSERT MUST BE IN 0 POSITION");
+                fprintf(stderr, "INSERT MUST BE IN 0 POSITION\n");
                 exit(EXIT_FAILURE);
             }
             else
             {
-                readTableFromFile("WTF.db", &Table);
+                readTableFromFile("WTF.db", Table);
                 pos++;
 
                 if (Queue->queue[pos]->type == COLUMN_LIST)
                 {
                     if (Queue->queue[pos]->numChildren != Queue->queue[pos + 1]->numChildren)
                     {
-                        fprintf(stderr, "COLUMN COUNT NOT EQUAL VALUES COUNT IN INSERT");
+                        fprintf(stderr, "COLUMN COUNT NOT EQUAL VALUES COUNT IN INSERT\n");
                         exit(EXIT_FAILURE);
                     }
                     else
                     {
-                        for (int i = 0; i < Table->size; i++)
+                        for (int i = 0; i < (*Table)->size; i++)
                         {
                             for (int j = 0; j < Queue->queue[pos]->numChildren; j++)
                             {
-                                if (strcmp(Table->columns[i]->columnName, Queue->queue[pos]->children[j]->lexeme) == 0)
+                                if (strcmp((*Table)->columns[i]->columnName, Queue->queue[pos]->children[j]->lexeme) == 0)
                                 {
 
-                                    insertValue(&Table, i, Queue->queue[pos + 1]->children[j]->lexeme);
+                                    insertValue(Table, i, Queue->queue[pos + 1]->children[j]->lexeme);
                                 }
                             }
                         }
@@ -146,16 +168,16 @@ void generate(nodeQueue *Queue, table **TAble)
                 }
                 else
                 {
-                    if (Table->size != Queue->queue[pos]->numChildren)
+                    if ((*Table)->size != Queue->queue[pos]->numChildren)
                     {
-                        fprintf(stderr, "COLUMN COUNT NOT EQUAL VALUES COUNT IN INSERT");
+                        fprintf(stderr, "COLUMN COUNT NOT EQUAL VALUES COUNT IN INSERT\n");
                         exit(EXIT_FAILURE);
                     }
                     else
                     {
-                        for (int i = 0; i < Table->size; i++)
+                        for (int i = 0; i < (*Table)->size; i++)
                         {
-                            insertValue(&Table, i, Queue->queue[pos]->children[i]->lexeme);
+                            insertValue(Table, i, Queue->queue[pos]->children[i]->lexeme);
                         }
                     }
                     pos++;
@@ -163,26 +185,28 @@ void generate(nodeQueue *Queue, table **TAble)
             }
             if (pos != Queue->queueSize)
             {
-                fprintf(stderr, "TOO MANY ARGUMENTS FOR INSERT");
+                fprintf(stderr, "TOO MANY ARGUMENTS FOR INSERT\n");
                 exit(EXIT_FAILURE);
             }
         }
         else if (Queue->queue[pos]->type == FROM)
         {
-            readTableFromFile("WTF.db", &Table);
+            readTableFromFile("WTF.db", Table);
             pos++;
         }
         else if (Queue->queue[pos]->type == SELECT)
         {
-            if (Table == NULL)
+            columnList Columns;
+            Columns.size = 0;
+            if ((*Table) == NULL)
             {
-                fprintf(stderr, "NEED TABLE FOR SELECT");
+                fprintf(stderr, "NEED TABLE FOR SELECT\n");
             }
             else
             {
                 if (Queue->queue[pos]->children[0]->type == ALL)
                 {
-                    for (int i = 0; i < Table->size; i++)
+                    for (int i = 0; i < (*Table)->size; i++)
                     {
                         Columns.id[Columns.size++] = i;
                     }
@@ -190,13 +214,13 @@ void generate(nodeQueue *Queue, table **TAble)
                 }
                 else
                 {
-                    for (int i = 0; i < Table->size; i++)
+                    for (int i = 0; i < (*Table)->size; i++)
                     {
                         for (int j = 0; j < Queue->queue[pos]->numChildren; j++)
                         {
-                            if (strcmp(Table->columns[i]->columnName, Queue->queue[pos]->children[j]->lexeme) == 0)
+                            if (strcmp((*Table)->columns[i]->columnName, Queue->queue[pos]->children[j]->lexeme) == 0)
                             {
-                                Columns.id[Columns.size] = i;
+                                Columns.id[Columns.size++] = i;
                             }
                         }
                     }
@@ -207,14 +231,14 @@ void generate(nodeQueue *Queue, table **TAble)
             {
                 for (int i = 0; i < Columns.size; i++)
                 {
-                    printColumn(Table->columns[Columns.id[i]]);
+                    printColumn((*Table)->columns[Columns.id[i]]);
                 }
             }
             else
             {
                 if (Queue->queue[pos]->type != WHERE)
                 {
-                    fprintf(stderr, "NEED WHERE AFTER FROM");
+                    fprintf(stderr, "NEED WHERE AFTER FROM\n");
                     exit(EXIT_FAILURE);
                 }
             }
@@ -225,18 +249,18 @@ void generate(nodeQueue *Queue, table **TAble)
             stringInd *list = NULL;
             if (Queue->queue[pos]->numChildren % 3 != 0 || Queue->queue[pos]->numChildren % 4 != 0)
             {
-                fprintf(stderr, "TOO SMALL ARGIMENTS FOR WHERE");
+                fprintf(stderr, "TOO SMALL ARGIMENTS FOR WHERE\n");
                 exit(EXIT_FAILURE);
             }
             if (Queue->queue[pos]->numChildren == 3)
             {
                 if (Queue->queue[pos]->children[2]->type != IDENTIFIER)
                 {
-                    list = makeSearchV(list, searchColumnInd(Table, Queue->queue[pos]->children[0]->lexeme), Queue->queue[pos]->children[2]->lexeme, Queue->queue[pos]->children[1]->type);
+                    list = makeSearchV(list, searchColumnInd(*Table, Queue->queue[pos]->children[0]->lexeme), Queue->queue[pos]->children[2]->lexeme, Queue->queue[pos]->children[1]->type);
                 }
                 else
                 {
-                    list = makeSearchV(list, searchColumnInd(Table, Queue->queue[pos]->children[0]->lexeme), searchColumnInd(Table, Queue->queue[pos]->children[2]->lexeme), Queue->queue[pos]->children[1]->type);
+                    list = makeSearchC(list, searchColumnInd(*Table, Queue->queue[pos]->children[0]->lexeme), searchColumnInd(*Table, Queue->queue[pos]->children[2]->lexeme), Queue->queue[pos]->children[1]->type);
                 }
             }
             else
@@ -249,11 +273,11 @@ void generate(nodeQueue *Queue, table **TAble)
                     {
                         if (Queue->queue[pos]->children[max - 1]->type != IDENTIFIER)
                         {
-                            list = makeSearchV(list, searchColumnInd(Table, Queue->queue[pos]->children[max - 3]->lexeme), searchColumnInd(Table, Queue->queue[pos]->children[max - 1]->lexeme), Queue->queue[pos]->children[max - 2]->type);
+                            list = makeSearchV(list, searchColumnInd(*Table, Queue->queue[pos]->children[max - 3]->lexeme), Queue->queue[pos]->children[max - 1]->lexeme, Queue->queue[pos]->children[max - 2]->type);
                         }
                         else
                         {
-                            list = makeSearchC(list, searchColumnInd(Table, Queue->queue[pos]->children[max - 3]->lexeme), searchColumnInd(Table, Queue->queue[pos]->children[max - 1]->lexeme), Queue->queue[pos]->children[max - 2]->type);
+                            list = makeSearchC(list, searchColumnInd(*Table, Queue->queue[pos]->children[max - 3]->lexeme), searchColumnInd(*Table, Queue->queue[pos]->children[max - 1]->lexeme), Queue->queue[pos]->children[max - 2]->type);
                         }
                     }
                     max++;
@@ -261,9 +285,14 @@ void generate(nodeQueue *Queue, table **TAble)
             }
             if (pos != Queue->queueSize)
             {
-                fprintf(stderr, "NEED NOTHING AFTER WHERE");
+                fprintf(stderr, "NEED NOTHING AFTER WHERE\n");
                 exit(EXIT_FAILURE);
             }
+        }
+        else
+        {
+            fprintf(stderr, "WTF ERROR\n");
+            exit(EXIT_FAILURE);
         }
     }
 }
@@ -274,7 +303,7 @@ stringInd *makeSearchC(stringInd *list, column *column1, column *column2, tokenT
 
     if (column1->type != column2->type)
     {
-        fprintf(stderr, "WRONG TYPES");
+        fprintf(stderr, "WRONG TYPES\n");
         exit(EXIT_FAILURE);
     }
 
@@ -349,7 +378,7 @@ stringInd *makeSearchC(stringInd *list, column *column1, column *column2, tokenT
     }
     else
     {
-        fprintf(stderr, "WRONG OPERATOR");
+        fprintf(stderr, "WRONG OPERATOR\n");
         exit(EXIT_FAILURE);
     }
     return temp;
@@ -436,7 +465,7 @@ stringInd *makeSearchV(stringInd *list, column *column1, void *value, tokenType 
     }
     else
     {
-        fprintf(stderr, "WRONG OPERATOR");
+        fprintf(stderr, "WRONG OPERATOR\n");
         exit(EXIT_FAILURE);
     }
     return temp;
