@@ -45,10 +45,10 @@ int main()
                         prepareGenerate(buffer, &Table);
                         free(buffer);
                         buffer = NULL;
-                    }
-                    if (Table != NULL)
-                    {
-                        writeTableToFile("WTF.db", Table);
+                        if (Table != NULL)
+                        {
+                            writeTableToFile("WTF.db", Table);
+                        }
                     }
                     fclose(file);
                 }

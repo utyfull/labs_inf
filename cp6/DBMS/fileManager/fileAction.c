@@ -6,7 +6,7 @@
 
 void writeTableToFile(const char *filename, table *t)
 {
-    FILE *file = fopen(filename, "wb");
+    FILE *file = fopen("/home/utyfull/Desktop/labs/labs_inf/cp6/WTF.db", "wb");
     if (file == NULL)
     {
         perror("Unable to open file");
@@ -41,12 +41,13 @@ void writeTableToFile(const char *filename, table *t)
             }
         }
     }
+    printf("Succsessfull write\n");
     fclose(file);
 }
 
 void readTableFromFile(const char *filename, table **t)
 {
-    FILE *file = fopen(filename, "rb");
+    FILE *file = fopen("/home/utyfull/Desktop/labs/labs_inf/cp6/WTF.db", "rb");
     if (file == NULL)
     {
         perror("Unable to open file");
@@ -87,5 +88,6 @@ void readTableFromFile(const char *filename, table **t)
             }
         }
     }
+    printf("Succsessfull read\n");
     fclose(file);
 }

@@ -51,6 +51,7 @@ void prepareGenerate(char *input, table **Table)
     destroyLexer(&Lexer);
     freeAST(&root);
     free(queue);
+    queue = NULL;
 }
 
 column *searchColumnInd(table *Table, char *columnName)
@@ -291,7 +292,7 @@ void generate(nodeQueue *Queue, table **Table)
         }
         else
         {
-            fprintf(stderr, "WTF ERROR\n");
+            fprintf(stderr, "%s - WTF ERROR\n", Queue->queue[pos]->lexeme);
             exit(EXIT_FAILURE);
         }
     }
