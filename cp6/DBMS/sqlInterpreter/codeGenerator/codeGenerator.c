@@ -7,6 +7,24 @@
 
 typeRelation types[] = {{INT_T, INTEGER}, {CHAR_T, CHAR}, {FLOAT_T, FLOAT}};
 
+void bubbleSort(nodeQueue **queue) // eto luchse zabit(za n^3 rabotaet, da ya geniy)(proclyatiy qsort v c ne rabotaet kak nado)
+{
+    ASTNode *temp;
+    for (int i = 1; i < (*queue)->queueSize; i++)
+    {
+        if ((*queue)->queue[i - 1]->priority > (*queue)->queue[i]->priority)
+        {
+            temp = (*queue)->queue[i - 1];
+            (*queue)->queue[i - 1] = (*queue)->queue[i];
+            (*queue)->queue[i] = temp;
+            if (i != (*queue)->queueSize)
+            {
+                bubbleSort(queue);
+            }
+        }
+    }
+}
+
 int compar(const void *p, const void *q)
 {
     if (((ASTNode *)(p))->priority < ((ASTNode *)(q))->priority)
@@ -14,6 +32,22 @@ int compar(const void *p, const void *q)
         return -1;
     }
     else if (((ASTNode *)(p))->priority > ((ASTNode *)(q))->priority)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+int reverseCompar(const void *p, const void *q)
+{
+    if (((ASTNode *)(q))->priority < ((ASTNode *)(p))->priority)
+    {
+        return -1;
+    }
+    else if (((ASTNode *)(q))->priority > ((ASTNode *)(p))->priority)
     {
         return 1;
     }
@@ -75,14 +109,20 @@ void generate(nodeQueue *Queue, table **Table)
     {
         return;
     }
-
+    if (Queue->queue[0]->type == SELECT)
+    {
+        bubbleSort(&Queue);
+    }
     // printf("%s\n", Queue->queue[0]->lexeme);
     // printf("%s\n", Queue->queue[1]->lexeme);
+    // printf("%s\n", Queue->queue[2]->lexeme);
     // printf("%d\n", Queue->queue[0]->priority);
     // printf("%d\n", Queue->queue[1]->priority);
+    // printf("%d\n", Queue->queue[2]->priority);
 
-    while (pos <= Queue->queueSize)
+    while (pos < Queue->queueSize)
     {
+        columnList Columns;
         if (Queue->queue[pos]->type == CREATE)
         {
             if (Queue->queue[pos]->position != 0)
@@ -165,9 +205,10 @@ void generate(nodeQueue *Queue, table **Table)
                             }
                         }
                     }
-                    pos += 2;
+                    pos += 3;
+                    continue;
                 }
-                else
+                else if (Queue->queue[pos]->type == VALUES_LIST)
                 {
                     if ((*Table)->size != Queue->queue[pos]->numChildren)
                     {
@@ -181,7 +222,8 @@ void generate(nodeQueue *Queue, table **Table)
                             insertValue(Table, i, Queue->queue[pos]->children[i]->lexeme);
                         }
                     }
-                    pos++;
+                    pos += 2;
+                    continue;
                 }
             }
             if (pos != Queue->queueSize)
@@ -197,7 +239,6 @@ void generate(nodeQueue *Queue, table **Table)
         }
         else if (Queue->queue[pos]->type == SELECT)
         {
-            columnList Columns;
             Columns.size = 0;
             if ((*Table) == NULL)
             {
@@ -205,7 +246,7 @@ void generate(nodeQueue *Queue, table **Table)
             }
             else
             {
-                if (Queue->queue[pos]->children[0]->type == ALL)
+                if (strcmp(Queue->queue[pos]->children[0]->lexeme, "*") == 0)
                 {
                     for (int i = 0; i < (*Table)->size; i++)
                     {
@@ -234,6 +275,7 @@ void generate(nodeQueue *Queue, table **Table)
                 {
                     printColumn((*Table)->columns[Columns.id[i]]);
                 }
+                break;
             }
             else
             {
@@ -248,7 +290,7 @@ void generate(nodeQueue *Queue, table **Table)
         {
             int max = 0;
             stringInd *list = NULL;
-            if (Queue->queue[pos]->numChildren % 3 != 0 || Queue->queue[pos]->numChildren % 4 != 0)
+            if (Queue->queue[pos]->numChildren % 3 != 0 && Queue->queue[pos]->numChildren % 4 != 0)
             {
                 fprintf(stderr, "TOO SMALL ARGIMENTS FOR WHERE\n");
                 exit(EXIT_FAILURE);
@@ -257,7 +299,7 @@ void generate(nodeQueue *Queue, table **Table)
             {
                 if (Queue->queue[pos]->children[2]->type != IDENTIFIER)
                 {
-                    list = makeSearchV(list, searchColumnInd(*Table, Queue->queue[pos]->children[0]->lexeme), Queue->queue[pos]->children[2]->lexeme, Queue->queue[pos]->children[1]->type);
+                    list = makeSearchV(list, searchColumnInd(*Table, Queue->queue[pos]->children[0]->lexeme), atof(Queue->queue[pos]->children[2]->lexeme), Queue->queue[pos]->children[1]->type);
                 }
                 else
                 {
@@ -274,7 +316,7 @@ void generate(nodeQueue *Queue, table **Table)
                     {
                         if (Queue->queue[pos]->children[max - 1]->type != IDENTIFIER)
                         {
-                            list = makeSearchV(list, searchColumnInd(*Table, Queue->queue[pos]->children[max - 3]->lexeme), Queue->queue[pos]->children[max - 1]->lexeme, Queue->queue[pos]->children[max - 2]->type);
+                            list = makeSearchV(list, searchColumnInd(*Table, Queue->queue[pos]->children[max - 3]->lexeme), atof(Queue->queue[pos]->children[max - 1]->lexeme), Queue->queue[pos]->children[max - 2]->type);
                         }
                         else
                         {
@@ -284,10 +326,22 @@ void generate(nodeQueue *Queue, table **Table)
                     max++;
                 }
             }
+            pos++;
             if (pos != Queue->queueSize)
             {
                 fprintf(stderr, "NEED NOTHING AFTER WHERE\n");
                 exit(EXIT_FAILURE);
+            }
+            if (Queue->queue[0]->type == SELECT && list->size != 0)
+            {
+                for (int j = 0; j < Columns.size; j++)
+                {
+                    column *temp = (*Table)->columns[j];
+                    for (int i = 0; i < list->size; i++)
+                    {
+                        printf("%d - value\n", *(int *)temp->Cells[i]->data);
+                    }
+                }
             }
         }
         else
@@ -385,7 +439,7 @@ stringInd *makeSearchC(stringInd *list, column *column1, column *column2, tokenT
     return temp;
 }
 
-stringInd *makeSearchV(stringInd *list, column *column1, void *value, tokenType operator)
+stringInd *makeSearchV(stringInd *list, column *column1, float value, tokenType operator)
 {
     stringInd *temp = malloc(sizeof(stringInd));
 
@@ -397,9 +451,12 @@ stringInd *makeSearchV(stringInd *list, column *column1, void *value, tokenType 
 
     if (operator== EQUAL_TO)
     {
+        printf("%f\n", *(float *)column1->Cells[0]->data);
+
         for (int i = 0; i < column1->size; i++)
         {
-            if (*(float *)column1->Cells[i]->data == *(float *)value)
+            printf("%f - 1v, %f -2v\n", value, *(float *)column1->Cells[i]->data);
+            if (*(float *)column1->Cells[i]->data == value)
             {
                 if (list != NULL)
                 {
@@ -422,7 +479,7 @@ stringInd *makeSearchV(stringInd *list, column *column1, void *value, tokenType 
     {
         for (int i = 0; i < column1->size; i++)
         {
-            if (*(float *)column1->Cells[i]->data > *(float *)value)
+            if (*(float *)column1->Cells[i]->data > value)
             {
                 if (list != NULL)
                 {
@@ -445,7 +502,7 @@ stringInd *makeSearchV(stringInd *list, column *column1, void *value, tokenType 
     {
         for (int i = 0; i < column1->size; i++)
         {
-            if (*(float *)column1->Cells[i]->data < *(float *)value)
+            if (*(float *)column1->Cells[i]->data < value)
             {
                 if (list != NULL)
                 {

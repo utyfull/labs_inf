@@ -41,7 +41,6 @@ void writeTableToFile(const char *filename, table *t)
             }
         }
     }
-    printf("Succsessfull write\n");
     fclose(file);
 }
 
@@ -88,6 +87,5 @@ void readTableFromFile(const char *filename, table **t)
             }
         }
     }
-    printf("Succsessfull read\n");
     fclose(file);
 }

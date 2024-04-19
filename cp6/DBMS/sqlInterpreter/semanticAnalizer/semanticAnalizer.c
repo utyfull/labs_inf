@@ -6,15 +6,15 @@
 #include <string.h>
 
 const keyWordPriority keyPriority[] = {
-    {TABLE_DDL, 2},
     {CREATE, 1},
+    {TABLE_DDL, 2},
     {ALTER, 3},
     {DROP, 4},
-    {SELECT, 9},
+    {FROM, 5},
     {INSERT, 6},
     {UPDATE, 7},
     {DELETE, 8},
-    {FROM, 5},
+    {SELECT, 9},
     {JOIN, 10},
     {ON, 11},
     {WHERE, 12},

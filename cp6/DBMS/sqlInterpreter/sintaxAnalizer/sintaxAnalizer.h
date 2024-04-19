@@ -10,7 +10,7 @@ typedef struct ASTNode
     int priority;
     tokenType type;
     char lexeme[100];
-    ASTNode *children[20];
+    ASTNode *children[30];
     int numChildren;
     int position;
 } ASTNode;

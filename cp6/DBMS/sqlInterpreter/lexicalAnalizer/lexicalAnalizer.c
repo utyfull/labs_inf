@@ -7,7 +7,7 @@
 #include <ctype.h>
 
 const TypeMapping keyWords[] = {
-    {"SELECT", SELECT}, {"INSERT", INSERT}, {"UPDATE", UPDATE}, {"DELETE", DELETE}, {"FROM", FROM}, {"WHERE", WHERE}, {"JOIN", JOIN}, {"INNER", INNER}, {"OUTER", OUTER}, {"LEFT", LEFT}, {"RIGHT", RIGHT}, {"ON", ON}, {"GROUPBY", GROUPBY}, {"ORDERBY", ORDERBY}, {"HAVING", HAVING}, {"LIMIT", LIMIT}, {"AND", AND}, {"OR", OR}, {"NOT", NOT}, {"INTO", INTO}, {"VALUES", VALUES}, {"SET", SET}, {"CREATE", CREATE}, {"ALTER", ALTER}, {"INDEX", INDEX}, {"DROP", DROP}, {"ADD", ADD}, {"DISTINCT", DISTINCT}};
+    {"FROM", FROM}, {"SELECT", SELECT}, {"INSERT", INSERT}, {"UPDATE", UPDATE}, {"DELETE", DELETE}, {"WHERE", WHERE}, {"JOIN", JOIN}, {"INNER", INNER}, {"OUTER", OUTER}, {"LEFT", LEFT}, {"RIGHT", RIGHT}, {"ON", ON}, {"GROUPBY", GROUPBY}, {"ORDERBY", ORDERBY}, {"HAVING", HAVING}, {"LIMIT", LIMIT}, {"AND", AND}, {"OR", OR}, {"NOT", NOT}, {"INTO", INTO}, {"VALUES", VALUES}, {"SET", SET}, {"CREATE", CREATE}, {"ALTER", ALTER}, {"INDEX", INDEX}, {"DROP", DROP}, {"ADD", ADD}, {"DISTINCT", DISTINCT}};
 
 const TypeMapping keyPhrases[] = {
     {"EXISTS", EXISTS}, {"IN", IN}, {"ANY", ANY}, {"ALL", ALL}, {"EXCEPT", EXCEPT}, {"INTERSECT", INTERSECT}, {"LIKE", LIKE}, {"BETWEEN", BETWEEN}, {"DESC", DESC}, {"ASC", ASC}};

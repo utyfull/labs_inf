@@ -7,8 +7,8 @@
 
 typedef enum
 {
-    SELECT = 1,       // "SELECT"
-    FROM = 2,         // "FROM"
+    FROM = 1,         // "FROM"
+    SELECT = 2,       // "SELECT"
     WHERE = 3,        // "WHERE"
     INSERT = 4,       // "INSERT"
     UPDATE = 5,       // "UPDATE"

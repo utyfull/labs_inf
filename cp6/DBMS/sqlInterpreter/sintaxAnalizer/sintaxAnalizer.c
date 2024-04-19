@@ -231,46 +231,56 @@ ASTNode *parse(token *tokenList, int numTokens)
 
             currentTokenIndex++;
 
-            if (tokenList[currentTokenIndex].type != LEFT_PARENTHESIS)
-            {
-                fprintf(stderr, "Ошибка: Ожидалась открывающая скобка перед списком значений\n");
-                exit(EXIT_FAILURE);
-            }
-
-            ASTNode *valuesListNode = createASTNode(VALUES_LIST, "VALUES_LIST");
-
-            (currentTokenIndex)++;
-
             while (currentTokenIndex < numTokens)
             {
-
-                if (tokenList[currentTokenIndex].type == RIGHT_PARENTHESIS)
+                if (tokenList[currentTokenIndex].type != LEFT_PARENTHESIS)
                 {
-
-                    break;
+                    fprintf(stderr, "Ошибка: Ожидалась открывающая скобка перед списком значений\n");
+                    exit(EXIT_FAILURE);
                 }
-                else if (tokenList[currentTokenIndex].type == COMMA)
+
+                ASTNode *valuesListNode = createASTNode(VALUES_LIST, "VALUES_LIST");
+
+                currentTokenIndex++;
+                while (currentTokenIndex < numTokens)
                 {
 
+                    if (tokenList[currentTokenIndex].type == RIGHT_PARENTHESIS)
+                    {
+
+                        break;
+                    }
+                    else if (tokenList[currentTokenIndex].type == COMMA)
+                    {
+
+                        currentTokenIndex++;
+                    }
+                    else
+                    {
+                        ASTNode *valueNode = createASTNode(tokenList[currentTokenIndex].type, tokenList[currentTokenIndex].lexeme);
+                        valuesListNode->children[valuesListNode->numChildren++] = valueNode;
+
+                        currentTokenIndex++;
+                    }
+                }
+                if (tokenList[currentTokenIndex].type != RIGHT_PARENTHESIS)
+                {
+                    fprintf(stderr, "Ошибка: Ожидалась закрывающая скобка после списка значений\n");
+                    exit(EXIT_FAILURE);
+                }
+                insertNode->children[insertNode->numChildren++] = valuesListNode;
+                currentTokenIndex++;
+                if (tokenList[currentTokenIndex].type == COMMA)
+                {
                     currentTokenIndex++;
+                    continue;
                 }
                 else
                 {
-
-                    ASTNode *valueNode = createASTNode(tokenList[currentTokenIndex].type, tokenList[currentTokenIndex].lexeme);
-                    valuesListNode->children[valuesListNode->numChildren++] = valueNode;
-
-                    currentTokenIndex++;
+                    break;
                 }
             }
 
-            if (tokenList[currentTokenIndex].type != RIGHT_PARENTHESIS)
-            {
-                fprintf(stderr, "Ошибка: Ожидалась закрывающая скобка после списка значений\n");
-                exit(EXIT_FAILURE);
-            }
-
-            insertNode->children[insertNode->numChildren++] = valuesListNode;
             root->children[root->numChildren++] = insertNode;
             currentTokenIndex++;
             continue;

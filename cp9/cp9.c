@@ -7,7 +7,7 @@
 void sortTable(table **Table)
 {
     int i, j;
-    char temp[12];
+    char temp[255];
 
     for (i = 0; i < (*Table)->countK - 1; i++)
     {
@@ -31,7 +31,7 @@ void insertData(table **Table)
 {
     (*Table) = (table *)realloc(*Table, sizeof(**Table));
     (*Table)->countK = 0;
-    FILE *file = fopen("keys.txt", "r");
+    FILE *file = fopen("keys3.txt", "r");
     if (file == NULL)
     {
         printf("Error opening file\n");
@@ -42,13 +42,19 @@ void insertData(table **Table)
 
     while (fgets(key, sizeof(key), file) != NULL)
     {
+        for (int i = 0; i < 16; i++)
+        {
+            if (key[i] == '\n')
+            {
+                key[i] = '\0';
+            }
+        }
         strcpy((*Table)->key[(*Table)->countK++], key);
     }
 
     fclose(file);
-
     (*Table)->countC = 0;
-    FILE *file2 = fopen("content.txt", "r");
+    FILE *file2 = fopen("content3.txt", "r");
     if (file2 == NULL)
     {
         printf("Error opening file\n");
@@ -59,7 +65,6 @@ void insertData(table **Table)
 
     while (fgets(content, sizeof(content), file2) != NULL)
     {
-        printf("%s\n", content);
         strcpy((*Table)->content[(*Table)->countC++], content);
     }
 
@@ -103,7 +108,7 @@ void printTable(table *Table)
     }
     for (int i = 0; i < Table->countK; i++)
     {
-        printf("Key: %s --- Value: %s\n", Table->key[i], Table->content[i]);
+        printf("Key: %s\nValue: %s\n", Table->key[i], Table->content[i]);
     }
 }
 
@@ -127,7 +132,7 @@ int main()
         {
             printTable(Table);
             sortTable(&Table);
-            printf("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_");
+            printf("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_\n");
             printTable(Table);
             continue;
         }
@@ -144,6 +149,7 @@ int main()
         }
         if (strcmp(command, "exit") == 0)
         {
+            free(Table);
             return 0;
         }
     }

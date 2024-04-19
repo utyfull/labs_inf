@@ -3,8 +3,8 @@
 
 typedef struct
 {
-    char key[16][12];
-    char content[255][12];
+    char key[12][16];
+    char content[12][255];
     int countK;
     int countC;
 } table;
