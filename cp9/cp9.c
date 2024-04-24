@@ -29,7 +29,7 @@ void sortTable(table **Table)
 
 void insertData(table **Table)
 {
-    (*Table) = (table *)realloc(*Table, sizeof(**Table));
+    (*Table) = (table *)malloc(sizeof(table));
     (*Table)->countK = 0;
     FILE *file = fopen("keys3.txt", "r");
     if (file == NULL)
