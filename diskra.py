@@ -1,8 +1,81 @@
 import tkinter as tk
 from tkinter import messagebox
+import itertools
 import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import numpy as np
+
+
+def latin_composition(graph):
+    n = len(graph)
+    max_length = n
+
+    # Создаем граф с использованием NetworkX
+    G = nx.DiGraph()
+    for i in range(n):
+        for j in range(n):
+            if graph[i][j] == 1:
+                G.add_edge(i, j)
+
+    print("Graph created with nodes and edges:")
+    print(G.nodes)
+    print(G.edges)
+
+    # Инициализация начальной матрицы для путей длины 1
+    L = np.empty((max_length + 1, n, n), dtype=object)
+    for i in range(n):
+        for j in range(n):
+            if graph[i][j] == 1:
+                L[1, i, j] = [[i, j]]
+            else:
+                L[1, i, j] = []
+
+    # Вывод начальной матрицы L
+    print("Initial matrix L[1]:")
+    for i in range(n):
+        for j in range(n):
+            print(f"L[1][{i}][{j}]: {L[1, i, j]}")
+
+    # Построение матриц L^(k) для k = 2, ..., max_length
+    for k in range(2, max_length + 1):
+        for i in range(n):
+            for j in range(n):
+                L[k, i, j] = []
+                for r in range(n):
+                    if L[k - 1, i, r] and L[1, r, j]:
+                        for path1 in L[k - 1, i, r]:
+                            for path2 in L[1, r, j]:
+                                new_path = path1 + path2[1:]
+                                if len(set(new_path[:-1])) == len(new_path[:-1]):  # Проверка простоты пути
+                                    L[k, i, j].append(new_path)
+
+    # Вывод матриц L
+    for k in range(2, max_length + 1):
+        print(f"Matrix L[{k}]:")
+        for i in range(n):
+            for j in range(n):
+                print(f"L[{k}][{i}][{j}]: {L[k, i, j]}")
+
+    # Нахождение всех контуров
+    contours = []
+    for k in range(2, max_length + 1):
+        for i in range(n):
+            for path in L[k, i, i]:
+                if path not in contours:  # Избегаем дублирования
+                    contours.append(path)
+
+
+    for contour in contours:
+        for i in range(len(contour)):
+            contour[i] = str(int(contour[i]) + 1)
+
+
+    print("Contours found:")
+    for contour in contours:
+        print(contour)
+
+    return contours
 
 class GraphApp:
     def __init__(self, root):
@@ -11,7 +84,7 @@ class GraphApp:
         self.root.geometry("1280x1024")
 
         self.matrix_size = 3
-        self.max_size = 6
+        self.max_size = 9
 
         # Матрица смежности
         self.adj_matrix = [[0] * self.matrix_size for _ in range(self.matrix_size)]
@@ -98,21 +171,21 @@ class GraphApp:
     def find_contours(self):
         self.clear_graph()
         self.adj_matrix = self.get_adj_matrix()
-        G = nx.DiGraph()
 
+        contours = latin_composition(self.adj_matrix)
+        self.contours_text.delete(1.0, tk.END)
+        for contour in contours:
+            self.contours_text.insert(tk.END, " -> ".join(map(str, contour)) + "\n")
+
+        self.draw_graph()
+
+    def draw_graph(self):
+        G = nx.DiGraph()
         for i in range(self.matrix_size):
             for j in range(self.matrix_size):
                 if self.adj_matrix[i][j] != 0:
                     G.add_edge(i + 1, j + 1)
 
-        contours = list(nx.simple_cycles(G))
-        self.contours_text.delete(1.0, tk.END)
-        for contour in contours:
-            self.contours_text.insert(tk.END, " -> ".join(map(str, contour)) + "\n")
-
-        self.draw_graph(G)
-
-    def draw_graph(self, G):
         fig, ax = plt.subplots(figsize=(8, 8))
         pos = nx.spring_layout(G)
         nx.draw(G, pos, ax=ax, with_labels=True, node_size=700, node_color="lightblue", arrowsize=20)
